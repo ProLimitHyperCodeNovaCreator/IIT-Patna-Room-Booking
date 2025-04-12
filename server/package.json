@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "This is a project that will ensure proper localization of IITP rooms and will make ensure to make allocations of IITP rooms easier",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "build": "tsc",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "format": "npm run prettier && npm run lint:fix",
+    "format:check": "npm run prettier:check && npm run lint",
+    "clean": "rimraf dist"
+  },
+  "author": "Aditya and Omesh",
+  "license": "ISC"
+}
