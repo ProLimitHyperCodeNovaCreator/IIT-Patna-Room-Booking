@@ -11,7 +11,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import SheetProvider from "@/components/sheetProvider"
 
 export function NavHeader() {
   const { data: session } = useSession()
@@ -39,9 +40,7 @@ export function NavHeader() {
   return (
     <header className="border-b">
       <div className="container mx-auto py-4 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold">
-          Your App
-        </Link>
+        <SheetProvider></SheetProvider>
 
         <div className="flex items-center gap-4">
           {session.user.role === "admin" && (

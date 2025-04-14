@@ -47,7 +47,7 @@ const handler = NextAuth({
           if (
             profile.email.includes("admin") ||
             profile.email.endsWith("@youradmindomain.com") ||
-            profile.email === "omesh@yourdomain.com"
+            profile.email === "omesh@yourdomain.com" || "aditya_2301cb03@iitp.ac.in"
           ) {
             token.role = "admin"
           } else {
