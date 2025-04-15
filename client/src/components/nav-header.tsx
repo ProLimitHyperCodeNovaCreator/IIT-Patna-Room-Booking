@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useSession, signOut } from "next-auth/react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,30 +12,45 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import SheetProvider from "@/components/sheetProvider"
+import SheetProvider from "@/components/sheetProvider";
+
+type ExtendedSession = {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    roles?: string[];
+  };
+}
 
 export function NavHeader() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
   if (!session) {
-    return null
+    return null;
   }
 
-  const initials = session.user?.name
-    ? session.user.name
+  // Cast session to our extended type
+  const extendedSession = session as unknown as ExtendedSession;
+  
+  const initials = extendedSession.user?.name
+    ? extendedSession.user.name
         .split(" ")
         .map((name) => name[0])
         .join("")
         .toUpperCase()
-    : "U"
+    : "U";
+
+  // Check if user has admin role
+  const isAdmin = extendedSession.user?.roles?.includes("admin");
 
   const handleSignOut = () => {
     // Sign out completely and redirect to sign-in page
     signOut({
       callbackUrl: "/auth/signin",
       redirect: true,
-    })
-  }
+    });
+  };
 
   return (
     <header className="border-b">
@@ -43,7 +58,7 @@ export function NavHeader() {
         <SheetProvider></SheetProvider>
 
         <div className="flex items-center gap-4">
-          {session.user.role === "admin" && (
+          {isAdmin && (
             <Link href="/dashboard/admin">
               <Button variant="ghost">Admin Dashboard</Button>
             </Link>
@@ -57,7 +72,7 @@ export function NavHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={session.user.image || ""} alt={session.user.name || "User"} />
+                  <AvatarImage src={extendedSession.user.image || ""} alt={extendedSession.user.name || "User"} />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               </Button>
@@ -65,8 +80,11 @@ export function NavHeader() {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{session.user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{session.user.email}</p>
+                  <p className="text-sm font-medium leading-none">{extendedSession.user.name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{extendedSession.user.email}</p>
+                  {isAdmin && (
+                    <p className="text-xs leading-none text-muted-foreground mt-1">Role: Admin</p>
+                  )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -76,5 +94,5 @@ export function NavHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

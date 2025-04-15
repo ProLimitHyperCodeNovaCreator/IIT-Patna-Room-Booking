@@ -1,23 +1,37 @@
-import { getServerSession } from "next-auth/next"
-import { redirect } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getServerSession } from "next-auth/next";
+import { redirect } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Import authOptions
+
+// Import the ExtendedSession type or define it here
+interface ExtendedSession {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    roles?: string[];
+  };
+  expires: string;
+}
 
 export default async function AdminDashboard() {
-  const session = await getServerSession()
+  // Pass authOptions to getServerSession and cast the result
+  const session = await getServerSession(authOptions) as ExtendedSession | null;
 
   if (!session) {
-    redirect("/auth/signin")
+    redirect("/auth/signin");
   }
 
-  // Check if user has admin role
-  if (session.user.role !== "admin") {
-    redirect("/dashboard/user")
+  // Check if user has admin role (safely)
+  const userRoles = session.user?.roles || [];
+  if (!userRoles.includes("admin")) {
+    redirect("/dashboard/user"); // Redirect non-admins
   }
 
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-      <p className="text-xl mb-8">Welcome, {session.user.name || "Admin"}!</p>
+      <p className="text-xl mb-8">Welcome, {session.user?.name || "Admin"}!</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
@@ -51,5 +65,5 @@ export default async function AdminDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
