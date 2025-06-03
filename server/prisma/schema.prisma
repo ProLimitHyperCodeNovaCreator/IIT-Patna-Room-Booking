@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  bookings  Booking[] @relation("UserBookings")
+  approvals Booking[] @relation("AdminApprovals")
+}
+
+model Booking {
+  id               String        @id @default(uuid())
+  eventTitle       String
+  eventDescription String
+  requestedById    String
+  approvedById     String?
+  startDate        DateTime
+  endDate          DateTime
+  status           BookingStatus @default(PENDING)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  room             Room          @relation(fields: [roomId], references: [id])
+  roomId           String
+  requestedBy      User          @relation("UserBookings", fields: [requestedById], references: [id])
+  approvedBy       User?         @relation("AdminApprovals", fields: [approvedById], references: [id])
+}
+
+model Room {
+  id          String    @id @default(uuid())
+  name        String
+  capacity    Int
+  bookings    Booking[]
+  description String
+  location    String
+  createdAt   DateTime  @default(now())
+  isAvailable Boolean   @default(true)
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
