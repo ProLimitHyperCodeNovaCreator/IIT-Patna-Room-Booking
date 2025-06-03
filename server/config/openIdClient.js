@@ -1,10 +1,11 @@
-const { Issuer } = require('openid-client');
 require('dotenv').config();
 
 let client;
 
 async function getClient() {
   if (client) return client;
+
+  const { Issuer } = await import('openid-client');
 
   const issuer = await Issuer.discover(
     `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/v2.0`

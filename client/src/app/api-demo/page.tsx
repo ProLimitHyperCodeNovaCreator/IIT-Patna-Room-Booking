@@ -1,19 +1,48 @@
 "use client"
 
-import { useSession } from "next-auth/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {get} from "@/services/apiEndPoints"
+import { useRouter } from "next/navigation"
 
 export default function ApiDemo() {
-  const { data: session } = useSession()
-  const [data, setData] = useState(null)
+  const router = useRouter();
+  const [user, setUser] = useState<null | { id?: string; role?: string; name?: string; email?: string }>(null)
+  const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
+  type AuthResponse = {
+    message?: string;
+    user?: {
+      id?: string;
+      name?: string;
+      email?: string;
+      role?: string;
+    };
+  };
+
+  useEffect(() => {
+      get("/api/auth/token")
+        .then((res) => {
+          const response = res?.data as AuthResponse;
+          const user = response.user;
+          if (!user) {
+            router.push("/login");
+          } else {
+            setUser(user);
+          }
+        })
+        .catch(() => {
+          router.push("/login");
+        });
+    },[]);
+
   async function fetchData(endpoint: string) {
-    if (!session?.accessToken) {
+
+    if (!user || !user?.id) {
       setError("You must be signed in to access protected data")
       return
     }
@@ -22,19 +51,14 @@ export default function ApiDemo() {
     setError("")
 
     try {
-      const response = await fetch(`http://localhost:5000/api/${endpoint}`, {
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-          "X-User-Role": session.user.role || "user",
-        },
-      })
+      const response = await get(`/api/${endpoint}`)
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.statusText}`)
+      if (response.status !== 200) {
+        throw new Error(`Failed to fetch data: ${response.data.message || "Unknown error"}`)
       }
 
-      const result = await response.json()
-      setData(result)
+      const result = await response.data;
+      setResult(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
     } finally {
@@ -66,24 +90,24 @@ export default function ApiDemo() {
 
             <TabsContent value="protected" className="space-y-4">
               <p>This endpoint requires authentication but is available to all users.</p>
-              <Button onClick={() => fetchData("protected")} disabled={loading || !session?.accessToken}>
+              <Button onClick={() => fetchData("protected")} disabled={loading || !user?.id}>
                 {loading ? "Loading..." : "Fetch Protected Data"}
               </Button>
             </TabsContent>
 
             <TabsContent value="admin" className="space-y-4">
               <p>This endpoint requires authentication AND admin role.</p>
-              <Button onClick={() => fetchData("admin")} disabled={loading || !session?.accessToken}>
-                {loading ? "Loading..." : "Fetch Admin Data"}
+              <Button onClick={() => fetchData("admin")} disabled={loading || !user?.id || user?.role !== "admin"}>
+                {loading ? "Loading..." : "Fetch Admin data"}
               </Button>
             </TabsContent>
           </Tabs>
 
           {error && <div className="p-4 mt-4 bg-red-100 text-red-700 rounded-md">{error}</div>}
 
-          {data && (
+          {user && (
             <div className="p-4 mt-4 bg-gray-100 rounded-md">
-              <pre className="whitespace-pre-wrap">{JSON.stringify(data, null, 2)}</pre>
+              <pre className="whitespace-pre-wrap">{JSON.stringify(user, null, 2)}</pre>
             </div>
           )}
         </CardContent>

@@ -3,7 +3,7 @@ const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv");
 const authRoutes = require('./routes/authRoutes');
-const protectedRoutes = require('./routes/protectedRoutes');
+const protectedRoutes = require('./routes/demoRoutes');
 
 dotenv.config(); // Load .env variables
 

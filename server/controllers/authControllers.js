@@ -13,12 +13,11 @@ const login = async (req, res) => {
 const callback = async (req, res) => {
   const client = await getClient();
   const params = client.callbackParams(req);
-  const tokenSet = await client.callback(process.env.AZURE_REDIRECT_URI, params);
+  const tokenSet = await client.callback(process.env.AZURE_AD_REDIRECT_URI, params);
   const userInfo = tokenSet.claims();
 
   const email = userInfo.preferred_username;
   const name = userInfo.name;
-  const oid = userInfo.oid;
 
   // ✅ Check if user exists
   let user = await prisma.user.findUnique({ where: { email } });
@@ -36,7 +35,7 @@ const callback = async (req, res) => {
   if(user.email === process.env.ADMIN_EMAIL) {
     user.role = 'admin'; // Set role to admin if email matches
   }
-  
+
   const payload = {
     name: user.name,
     email: user.email,
@@ -47,13 +46,29 @@ const callback = async (req, res) => {
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
   res.cookie('token', token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: false, // true in production
     sameSite: 'lax',
     maxAge: 60 * 60 * 1000
   });
+  res.redirect(`http://localhost:3000/dashboard/${user.role}`); // Redirect to your dashboard or home page
+};
 
-  res.redirect('/dashboard');
+const getToken = (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid or expired token' });
+    }
+    res.status(200).json({
+      message: 'Token is valid',
+      user
+    });
+  });
 };
 
 const logout = (req, res) => {
@@ -66,5 +81,6 @@ const logout = (req, res) => {
 module.exports = {
   login,
   callback,
-  logout
+  logout,
+  getToken
 };

@@ -1,10 +1,12 @@
 "use client"
 
-import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function Login() {
+  const handleSignIn = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER}/api/auth/login`;
+  }
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
@@ -13,7 +15,7 @@ export default function Login() {
           <CardDescription className="text-center">Sign in to your account using Microsoft</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center">
-          <Button onClick={() => signIn("azure-ad", { callbackUrl: "/" })} className="w-full">
+          <Button onClick={() => handleSignIn()} className="w-full">
             Sign in with Microsoft
           </Button>
         </CardContent>

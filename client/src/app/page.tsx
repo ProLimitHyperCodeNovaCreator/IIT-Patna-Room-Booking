@@ -1,20 +1,38 @@
-import { getServerSession } from "next-auth/next"
-import { redirect } from "next/navigation"
+"use client";
 
-export default async function Home() {
-  const session = await getServerSession()
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { get } from "@/services/apiEndPoints";
 
-  if (!session) {
-    redirect("/login")
-  }
+export default function HomeRedirector() {
+  const router = useRouter();
+  type AuthResponse = {
+    message?: string;
+    user?: {
+      id?: string;
+      name?: string;
+      email?: string;
+      role?: string;
+    };
+  };
 
-  // Route based on user role
-  if (session.user.role === "admin") {
-    redirect("/dashboard/admin")
-  } else {
-    redirect("/dashboard/user")
-  }
+  useEffect(() => {
+    get("/api/auth/token")
+      .then((res) => {
+        const response = res?.data as AuthResponse;
+        const user = response.user;
+        if (!user) {
+          router.push("/login");
+        } else if (user.role === "admin") {
+          router.push("/dashboard/admin");
+        } else {
+          router.push("/dashboard/user");
+        }
+      })
+      .catch(() => {
+        router.push("/login");
+      });
+  },[]);
 
-  // This will never be rendered
-  return null
+  return null; // nothing is rendered
 }
