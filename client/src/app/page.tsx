@@ -5,7 +5,7 @@ export default async function Home() {
   const session = await getServerSession()
 
   if (!session) {
-    redirect("/auth/signin")
+    redirect("/login")
   }
 
   // Route based on user role
