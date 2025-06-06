@@ -1,4 +1,3 @@
-const prisma = require('../config/prismaConfig'); 
 
 const protectedDemoCheck = async (req, res) => {
     const user = req.user; // User should be set by the auth middleware

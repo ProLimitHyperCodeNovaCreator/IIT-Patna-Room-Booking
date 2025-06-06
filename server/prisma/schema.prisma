@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  //output   = "../generated/prisma"
 }
 
 datasource db {
@@ -43,7 +43,7 @@ model Booking {
 
 model Room {
   id          String    @id @default(uuid())
-  name        String
+  name        String    @unique
   capacity    Int
   bookings    Booking[]
   description String

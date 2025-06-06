@@ -1,38 +1,46 @@
-"use client";
-
-import { useEffect } from "react";
+'use client'
 import { useRouter } from "next/navigation";
-import { get } from "@/services/apiEndPoints";
+import { useEffect } from "react";
+import { get } from '@/services/apiEndPoints';
 
-export default function HomeRedirector() {
+interface User {
+  role: 'admin' | 'user';
+  email?: string;
+  name?: string;
+  // add more user properties if needed
+}
+
+interface AuthResponse {
+  user: User;
+  // add more response properties if needed
+}
+
+export default function Home() {
   const router = useRouter();
-  type AuthResponse = {
-    message?: string;
-    user?: {
-      id?: string;
-      name?: string;
-      email?: string;
-      role?: string;
-    };
-  };
 
   useEffect(() => {
-    get("/api/auth/token")
-      .then((res) => {
-        const response = res?.data as AuthResponse;
-        const user = response.user;
-        if (!user) {
-          router.push("/login");
-        } else if (user.role === "admin") {
-          router.push("/dashboard/admin");
-        } else {
-          router.push("/dashboard/user");
-        }
-      })
-      .catch(() => {
-        router.push("/login");
-      });
-  },[]);
+    async function fetchData() {
+      try {
+        const response = await get('/auth/token');
+        if (response.status === 200) {
+          const request = response.data as AuthResponse;
 
-  return null; // nothing is rendered
+          if (request?.user?.role === 'admin') {
+            router.push('/dashboard/admin');
+          } else if (request?.user?.role === 'user') {
+            router.push('/dashboard/user');
+          }
+        } else if (response.status === 401) {
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('Error fetching token:', error);
+        router.push('/login'); // fallback in case of fetch failure
+      }
+    }
+
+    fetchData();
+  }, [router]); // safer to include router in the deps array
+
+  return null;
 }

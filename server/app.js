@@ -3,7 +3,12 @@ const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv");
 const authRoutes = require('./routes/authRoutes');
-const protectedRoutes = require('./routes/demoRoutes');
+const demoRoutes = require('./routes/demoRoutes');
+const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const session = require("express-session");
+const passport = require("passport");
+require("./config/passport");
 
 dotenv.config(); // Load .env variables
 
@@ -24,9 +29,19 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
 
-app.use('/api/auth', authRoutes);
-app.use('/api', protectedRoutes);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/auth', authRoutes);
+app.use('/api', demoRoutes);
+app.use('/user', userRoutes);
+app.use('/admin', adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello User!");
