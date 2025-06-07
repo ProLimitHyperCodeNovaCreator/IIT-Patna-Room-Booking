@@ -10,7 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Search } from "lucide-react";
+import { MapPin, User } from "lucide-react";
 
 interface IUser {
   role: "admin" | "user";
@@ -26,7 +28,7 @@ interface IAuthResponse {
 interface IRoom {
   name: string;
   capacity: number;
-  description: string;
+  description: string[];
   location: string;
 }
 
@@ -43,8 +45,20 @@ const Page: React.FC = () => {
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [roomName, setRoomName] = useState<string>("");
   const [roomCapacity, setRoomCapacity] = useState<number>(0);
-  const [roomDescription, setRoomDescription] = useState<string>("");
+  const [roomDescription, setRoomDescription] = useState<string[]>([]);
   const [roomLocation, setRoomLocation] = useState<string>("");
+  const [tagAdding, setTagAdding] = useState<boolean>(false);
+  const [tag, setTag] = useState<string>("");
+  const [checkBoxes, setCheckBoxes] = useState<string[]>([
+  "AC Available",
+  "Projector Available",
+  "Whiteboard Available",
+  "Computer Room",
+  "Meeting Room",
+  "Wifi Enabled",
+  "TV Available",
+  "Classroom",
+]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +116,7 @@ const Page: React.FC = () => {
         }
         setRoomName("");
         setRoomCapacity(0);
-        setRoomDescription("");
+        setRoomDescription([]);
         setRoomLocation("");
       }
     } catch (error) {
@@ -135,26 +149,78 @@ const Page: React.FC = () => {
             onChange={(e) => setRoomName(e.target.value)}
             type="text"
             placeholder="Room name"
-            className="border border-gray-300 rounded-md p-2 mr-2"
+            className="border border-gray-300 rounded-md p-2 mr-2 my-2"
           />
           <input
             onChange={(e) => setRoomCapacity(parseInt(e.target.value))}
             type="number"
             placeholder="Capacity"
-            className="border border-gray-300 rounded-md p-2 mr-2"
+            className="border border-gray-300 rounded-md p-2 mr-2 my-2"
           />
           <input
             onChange={(e) => setRoomLocation(e.target.value)}
             type="text"
             placeholder="Location"
-            className="border border-gray-300 rounded-md p-2 mr-2"
+            className="border border-gray-300 rounded-md p-2 mr-2 my-2"
           />
-          <textarea
+          {/* <textarea
             onChange={(e) => setRoomDescription(e.target.value)}
             name="description"
             placeholder="Description"
             className="border border-gray-300 rounded-md p-2 mt-2 w-full"
-          ></textarea>
+          ></textarea> */}
+          <div className=" mb-4 flex gap-3 items-center flex-wrap">
+            {checkBoxes.map((checkbox, index) => (
+              <label key={index} className="flex items-center mt-2 mr-3">
+                <Checkbox
+                  checked={roomDescription.includes(checkbox)}
+                  onCheckedChange={(checked) => {
+                    setRoomDescription((prev) =>
+                      checked
+                        ? [...prev, checkbox]
+                        : prev.filter((tag) => tag !== checkbox)
+                    );
+                  }}
+                />
+                <span className="ml-2">{checkbox}</span>
+              </label>
+            ))}
+
+            {!tagAdding && (
+              <div
+                className="self-end text-base mt-2 ml-1 px-2 py-1 rounded-md text-purple-600 font-semibold cursor-pointer hover:text-purple-800 hover:bg-purple-100 transition-colors duration-200"
+                onClick={() => setTagAdding(true)}
+              >
+                + Add tag
+              </div>
+            )}
+          </div>
+
+          {tagAdding && (
+            <div className="flex items-center gap-2 mb-4">
+              <Input
+                type="text"
+                placeholder="New tag"
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+                className="max-w-sm"
+              />
+              <button
+                type="button"
+                className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition"
+                onClick={() => {
+                  if (tag && !checkBoxes.includes(tag)) {
+                    setCheckBoxes(prev => [...prev, tag]);
+                    setRoomDescription((prev) => [...prev, tag]);
+                  }
+                  setTag("");
+                  setTagAdding(false);
+                }}
+              >
+                Add
+              </button>
+            </div>
+          )}
           <button
             type="submit"
             className="bg-blue-500 text-white rounded-md p-2 cursor-pointer hover:bg-blue-600"
@@ -163,7 +229,6 @@ const Page: React.FC = () => {
           </button>
         </form>
       </div>
-
       <div className="w-full flex flex-col items-start mt-4">
         <div className="flex gap-2 items-center w-full max-w-md mb-4">
           <Search className="w-6 h-6" />
@@ -179,18 +244,24 @@ const Page: React.FC = () => {
             filteredRooms.map((room) => (
               <Card key={room.name}>
                 <CardHeader>
-                  <CardTitle>{room.name}</CardTitle>
-                  <CardDescription>{room.location}</CardDescription>
+                  <CardTitle><h1 className="text-2xl font-bold">{room.name}</h1></CardTitle>
+                  <CardDescription className="flex gap-2"><MapPin/> {room.location}</CardDescription>
+                  <CardDescription className="flex gap-2"><User/>{room.capacity} people</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>Capacity: {room.capacity}</p>
-                  <p>{room.description}</p>
+                  {room.description && (
+                    <div className="flex gap-1 flex-wrap">
+                      {room.description.map((description, index) => (
+                        <span className="bg-blue-200 bg-opacity-10 px-2 py-1 rounded-full text-blue-600 border border-blue-600" key={index}>{description}</span>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))
           ) : (
             <div className="col-span-full text-center font-bold text-xl">
-              No such rooms found or they are not for booking :(
+              No such rooms found or they are not for booking :&#40;
             </div>
           )}
         </div>

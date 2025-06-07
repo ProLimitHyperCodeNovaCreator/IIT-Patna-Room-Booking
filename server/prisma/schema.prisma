@@ -46,7 +46,7 @@ model Room {
   name        String    @unique
   capacity    Int
   bookings    Booking[]
-  description String
+  description String[]
   location    String
   createdAt   DateTime  @default(now())
   isAvailable Boolean   @default(true)
