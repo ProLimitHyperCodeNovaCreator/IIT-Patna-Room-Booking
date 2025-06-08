@@ -15,7 +15,7 @@ import { Search } from "lucide-react";
 import { MapPin, User } from 'lucide-react';
 
 interface IUser {
-  role: "admin" | "user";
+  role: "ADMIN" | "USER";
   email?: string;
   name?: string;
 }
@@ -31,6 +31,7 @@ interface IRoomResponse {
 }
 
 interface IRoom {
+  id: string;
   name: string;
   capacity: number;
   description: string[];
@@ -126,14 +127,14 @@ const Page: React.FC = () => {
                 </CardContent>
                 <CardFooter className="flex justify-start gap-2">
                   <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => router.push(`/booking/${room.name}`)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+                    onClick={() => router.push(`/roomBook/${room.id}`)}
                   >
                     Book Now
                   </button>
                   <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => router.push(`/booking/${room.name}`)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+                    onClick={() => router.push(`/vacancyChart/${room.id}`)}
                   >
                     See Vacancy Chart
                   </button>

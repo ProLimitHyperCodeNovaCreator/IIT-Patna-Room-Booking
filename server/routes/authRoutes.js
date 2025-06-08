@@ -31,7 +31,7 @@ router.get("/google/callback",
     console.log(token);
 
     // Option: Cookie or Redirect with token
-    res.redirect(`http://localhost:3000/dashboard/${user.role}`);
+    res.redirect(`http://localhost:3000/dashboard/${user.role.toLowerCase()}`);
   }
 );
 
@@ -44,6 +44,7 @@ router.get("/logout", (req, res) => {
     });
 
     res.status(200).json({ message: "Logged out successfully" });
+    res.redirect("http://localhost:3000/login");
   } catch (error) {
     res
       .status(500)

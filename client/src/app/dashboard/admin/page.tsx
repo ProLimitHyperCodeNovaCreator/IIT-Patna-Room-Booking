@@ -15,7 +15,7 @@ import { Search } from "lucide-react";
 import { MapPin, User } from "lucide-react";
 
 interface IUser {
-  role: "admin" | "user";
+  role: "ADMIN" | "USER";
   email?: string;
   name?: string;
 }
@@ -73,7 +73,7 @@ const Page: React.FC = () => {
           const currentUser = request.user;
 
           if (currentUser) {
-            if (currentUser.role !== "admin") {
+            if (currentUser.role !== "ADMIN") {
               router.push("/dashboard/user");
             }
             if (rooms.status === 200) {

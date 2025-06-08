@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { get } from '@/services/apiEndPoints';
 
 interface User {
-  role: 'admin' | 'user';
+  role: 'ADMIN' | 'USER';
   email?: string;
   name?: string;
   // add more user properties if needed
@@ -25,9 +25,9 @@ export default function Home() {
         if (response.status === 200) {
           const request = response.data as AuthResponse;
 
-          if (request?.user?.role === 'admin') {
+          if (request?.user?.role === 'ADMIN') {
             router.push('/dashboard/admin');
-          } else if (request?.user?.role === 'user') {
+          } else if (request?.user?.role === 'USER') {
             router.push('/dashboard/user');
           }
         } else if (response.status === 401) {
