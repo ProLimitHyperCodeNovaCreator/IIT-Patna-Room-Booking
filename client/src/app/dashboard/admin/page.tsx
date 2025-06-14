@@ -8,9 +8,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { MapPin, User } from "lucide-react";
 
@@ -26,6 +28,7 @@ interface IAuthResponse {
 }
 
 interface IRoom {
+  id: string;
   name: string;
   capacity: number;
   description: string[];
@@ -50,15 +53,15 @@ const Page: React.FC = () => {
   const [tagAdding, setTagAdding] = useState<boolean>(false);
   const [tag, setTag] = useState<string>("");
   const [checkBoxes, setCheckBoxes] = useState<string[]>([
-  "AC Available",
-  "Projector Available",
-  "Whiteboard Available",
-  "Computer Room",
-  "Meeting Room",
-  "Wifi Enabled",
-  "TV Available",
-  "Classroom",
-]);
+    "AC Available",
+    "Projector Available",
+    "Whiteboard Available",
+    "Computer Room",
+    "Meeting Room",
+    "Wifi Enabled",
+    "TV Available",
+    "Classroom",
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -210,7 +213,7 @@ const Page: React.FC = () => {
                 className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition"
                 onClick={() => {
                   if (tag && !checkBoxes.includes(tag)) {
-                    setCheckBoxes(prev => [...prev, tag]);
+                    setCheckBoxes((prev) => [...prev, tag]);
                     setRoomDescription((prev) => [...prev, tag]);
                   }
                   setTag("");
@@ -244,19 +247,39 @@ const Page: React.FC = () => {
             filteredRooms.map((room) => (
               <Card key={room.name}>
                 <CardHeader>
-                  <CardTitle><h1 className="text-2xl font-bold">{room.name}</h1></CardTitle>
-                  <CardDescription className="flex gap-2"><MapPin/> {room.location}</CardDescription>
-                  <CardDescription className="flex gap-2"><User/>{room.capacity} people</CardDescription>
+                  <CardTitle>
+                    <h1 className="text-2xl font-bold">{room.name}</h1>
+                  </CardTitle>
+                  <CardDescription className="flex gap-2">
+                    <MapPin /> {room.location}
+                  </CardDescription>
+                  <CardDescription className="flex gap-2">
+                    <User />
+                    {room.capacity} people
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {room.description && (
                     <div className="flex gap-1 flex-wrap">
                       {room.description.map((description, index) => (
-                        <span className="bg-blue-200 bg-opacity-10 px-2 py-1 rounded-full text-blue-600 border border-blue-600" key={index}>{description}</span>
+                        <span
+                          className="bg-blue-200 bg-opacity-10 px-2 py-1 rounded-full text-blue-600 border border-blue-600"
+                          key={index}
+                        >
+                          {description}
+                        </span>
                       ))}
                     </div>
                   )}
                 </CardContent>
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    onClick={() => router.push(`/bookingDetails/${room.id}`)}
+                  >
+                    View Booking requests
+                  </Button>
+                </CardFooter>
               </Card>
             ))
           ) : (

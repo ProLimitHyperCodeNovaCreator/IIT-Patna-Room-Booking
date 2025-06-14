@@ -11,13 +11,14 @@ router.get("/google/callback",
   passport.authenticate("google", { session: false }),
   (req, res) => {
     const user = req.user;
+    console.log(user);
 
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
     const token = jwt.sign(
-      { name: user.name, email: user.email, role: user.role },
+      { name: user.name, email: user.email, role: user.role, id:user.id },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );

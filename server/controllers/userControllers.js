@@ -68,7 +68,37 @@ const roomBook = async (req, res) => {
   }
 };
 
+const roomBookings = async (req, res) => {
+  try {
+    const {roomId} = req.params;
+    const bookings = await prisma.booking.findMany({
+      where: {
+        roomId,
+        status: "APPROVED",
+      },
+      select: {
+        id: true,
+        eventTitle: true,
+        eventDescription: true,
+        startDate: true,
+        endDate: true,
+        requestedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    res.status(200).json({ message: "Bookings fetched successfully", bookings });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getRooms,
   roomBook,
+  roomBookings,
 };
