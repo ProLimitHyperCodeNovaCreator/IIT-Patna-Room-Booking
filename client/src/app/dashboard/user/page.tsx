@@ -8,11 +8,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter
+  CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { MapPin, User } from 'lucide-react';
+import { MapPin, User } from "lucide-react";
 
 interface IUser {
   role: "ADMIN" | "USER";
@@ -36,6 +36,7 @@ interface IRoom {
   capacity: number;
   description: string[];
   location: string;
+  isAvailable: boolean;
 }
 
 const Page: React.FC = () => {
@@ -112,26 +113,60 @@ const Page: React.FC = () => {
             filteredRooms.map((room) => (
               <Card key={room.name}>
                 <CardHeader>
-                  <CardTitle className="mb-2"><h1 className="text-2xl">{room.name}</h1></CardTitle>
-                  <CardDescription className="flex gap-2"><MapPin/> {room.location}</CardDescription>
-                  <CardDescription className="flex gap-2"><User/> {room.capacity} people</CardDescription>
+                  <div className="flex justify-between">
+                    <CardTitle className="mb-2">
+                      <h1 className="text-2xl">{room.name}</h1>
+                    </CardTitle>
+                    <div className="flex gap-2 justify-center items-center">
+                      <span
+                        className={`${
+                          room.isAvailable ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        ●
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {room.isAvailable
+                          ? "Booking Available"
+                          : "Booking Not available"}
+                      </span>
+                    </div>
+                  </div>
+                  <CardDescription className="flex gap-2">
+                    <MapPin /> {room.location}
+                  </CardDescription>
+                  <CardDescription className="flex gap-2">
+                    <User /> {room.capacity} people
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {room.description && (
                     <div className="flex gap-1 flex-wrap">
                       {room.description.map((description, index) => (
-                        <span className="bg-blue-200 bg-opacity-10 px-2 py-1 rounded-full text-blue-600 border border-blue-600" key={index}>{description}</span>
+                        <span
+                          className="bg-blue-200 bg-opacity-10 px-2 py-1 rounded-full text-blue-600 border border-blue-600"
+                          key={index}
+                        >
+                          {description}
+                        </span>
                       ))}
                     </div>
                   )}
                 </CardContent>
                 <CardFooter className="flex justify-start gap-2">
                   <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+                    disabled={!room.isAvailable}
                     onClick={() => router.push(`/roomBook/${room.id}`)}
+                    className={`font-bold py-2 px-4 rounded-lg 
+                        ${
+                          room.isAvailable
+                            ? "bg-blue-500 hover:bg-blue-700 text-white cursor-pointer"
+                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                        }`}
                   >
                     Book Now
                   </button>
+
                   <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
                     onClick={() => router.push(`/vacancyChart/${room.id}`)}

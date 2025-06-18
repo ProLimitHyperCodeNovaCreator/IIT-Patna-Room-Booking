@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { MapPin, User } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface IUser {
   role: "ADMIN" | "USER";
@@ -33,6 +34,7 @@ interface IRoom {
   capacity: number;
   description: string[];
   location: string;
+  isAvailable: boolean;
 }
 
 interface IRoomResponse {
@@ -121,6 +123,49 @@ const Page: React.FC = () => {
         setRoomCapacity(0);
         setRoomDescription([]);
         setRoomLocation("");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAvailabilityChange = async (
+    roomId: string,
+    isAvailable: boolean
+  ) => {
+    setRooms((prev) =>
+      prev.map((room) => (room.id === roomId ? { ...room, isAvailable } : room))
+    );
+    try {
+      const response = await post(`/admin/avaibilityChange`, {
+        roomId,
+        isAvailable,
+      });
+      console.log(response);
+      if (response.status === 200) {
+        const roomRes = response.data as IRoomResponse;
+        const updatedRoom = roomRes.room;
+        console.log(updatedRoom);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteRoom = async (roomId: string) => {
+    try {
+      const response = await post(`/admin/roomDelete`, {
+        roomId,
+      });
+      console.log(response);
+      if (response.status === 200) {
+        const roomRes = response.data as IRoomResponse;
+        const deletedRoom = roomRes.room;
+        if (deletedRoom) {
+          setRooms((prevRooms) =>
+            prevRooms.filter((room) => room.id !== deletedRoom.id)
+          );
+        }
       }
     } catch (error) {
       console.error(error);
@@ -248,7 +293,21 @@ const Page: React.FC = () => {
               <Card key={room.name}>
                 <CardHeader>
                   <CardTitle>
-                    <h1 className="text-2xl font-bold">{room.name}</h1>
+                    <div className="flex justify-between">
+                      <h1 className="text-2xl font-bold">{room.name}</h1>
+                      <div className="flex flex-col justify-center items-center">
+                        <Switch
+                          checked={room.isAvailable}
+                          onCheckedChange={(checked) =>
+                            handleAvailabilityChange(room.id, checked)
+                          }
+                          className="cursor-pointer"
+                        ></Switch>
+                        <p className="text-sm text-gray-500">
+                          {room.isAvailable ? "" : "NA"}
+                        </p>
+                      </div>
+                    </div>
                   </CardTitle>
                   <CardDescription className="flex gap-2">
                     <MapPin /> {room.location}
@@ -273,12 +332,21 @@ const Page: React.FC = () => {
                   )}
                 </CardContent>
                 <CardFooter>
-                  <Button
-                    className="w-full"
-                    onClick={() => router.push(`/bookingDetails/${room.id}`)}
-                  >
-                    View Booking requests
-                  </Button>
+                  <div className="w-full flex justify-between">
+                    <Button
+                      className="cursor-pointer"
+                      onClick={() => router.push(`/bookingDetails/${room.id}`)}
+                    >
+                      View Booking requests
+                    </Button>
+                    <Button
+                      variant={"destructive"}
+                      className="cursor-pointer"
+                      onClick={() => handleDeleteRoom(room.id)}
+                    >
+                      Delete room
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
             ))

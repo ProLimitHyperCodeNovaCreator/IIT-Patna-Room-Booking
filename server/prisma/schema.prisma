@@ -35,7 +35,7 @@ model Booking {
   status           BookingStatus @default(PENDING)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
-  room             Room          @relation(fields: [roomId], references: [id])
+  room             Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId           String
   requestedBy      User          @relation("UserBookings", fields: [requestedById], references: [id])
   approvedBy       User?         @relation("AdminApprovals", fields: [approvedById], references: [id])
