@@ -80,62 +80,74 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-xl space-y-6 border"
+        className="w-full max-w-md bg-white border border-gray-200 p-8 rounded-2xl shadow-md space-y-6"
       >
-        <h2 className="text-2xl font-semibold text-gray-800 text-center">
-          Book a room for an event
+        <h2 className="text-2xl font-bold text-gray-900 text-center">
+          Book a Room
         </h2>
+        <p className="text-sm text-gray-500 text-center">
+          Fill in the event details below to request a room.
+        </p>
+
         {error && (
-          <div className="text-red-500 bg-red-100 p-4 border-2 border-red-400 rounded-xl w-full text-sm">
+          <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg">
             {error}
           </div>
         )}
-        <div className="space-y-2">
-          <label className="block text-gray-700 font-medium">Event Name</label>
+
+        {/* Event Name */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
+            Event Name
+          </label>
           <input
             type="text"
             value={eventName}
             onChange={(e) => setEventName(e.target.value)}
             placeholder="Enter event name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-gray-700 font-medium">
+        {/* Event Description */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
             Event Description
           </label>
-          <input
-            type="text"
+          <textarea
+            rows={4}
             value={eventDescription}
             onChange={(e) => setEventDescription(e.target.value)}
-            placeholder="Enter event description"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Describe the event purpose, audience, etc."
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition resize-none"
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-gray-700 font-medium">
+        {/* Start Date */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
             Start Date & Time
           </label>
-          <DateTimeInput label="" value={startDate} onChange={setStartDate} />
+          <DateTimeInput value={startDate} onChange={setStartDate} />
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-gray-700 font-medium">
+        {/* End Date */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
             End Date & Time
           </label>
-          <DateTimeInput label="" value={endDate} onChange={setEndDate} />
+          <DateTimeInput value={endDate} onChange={setEndDate} />
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-2.5 rounded-lg transition-all"
         >
-          Submit
+          Submit Request
         </button>
       </form>
     </div>

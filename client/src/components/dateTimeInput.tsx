@@ -11,11 +11,9 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
 export default function DateTimeInput({
-  label,
   value,
   onChange,
 }: {
-  label: string;
   value: Date | null;
   onChange: (date: Date) => void;
 }) {
@@ -45,8 +43,6 @@ export default function DateTimeInput({
 
   return (
     <div className="space-y-2">
-      <label className="block text-gray-700 text-sm font-medium">{label}</label>
-
       <Popover>
         <PopoverTrigger asChild>
           <Button
