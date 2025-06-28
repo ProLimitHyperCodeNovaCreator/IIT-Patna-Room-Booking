@@ -12,8 +12,7 @@ const createRoom = async (req, res) => {
         location,
       },
     });
-    const rooms = await prisma.room.findMany();
-    res.status(201).json({ message: "Room created successfully", room, rooms });
+    res.status(201).json({ message: "Room created successfully", room});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

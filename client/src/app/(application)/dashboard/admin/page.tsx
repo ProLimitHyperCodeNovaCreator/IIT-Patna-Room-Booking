@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { MapPin, User } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { DeleteRoom } from "./dialogDelete";
 
 interface IUser {
   role: "ADMIN" | "USER";
@@ -106,6 +108,15 @@ const Page: React.FC = () => {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      if(
+        roomName === "" ||
+        roomCapacity === 0 ||
+        roomDescription.length === 0 ||
+        roomLocation === ""
+      ){
+        toast.error("Atleast fill all the neccesary details. Damm it!!");
+        return;
+      }
       const response = await post(`/admin/createRoom`, {
         name: roomName,
         capacity: roomCapacity,
@@ -115,10 +126,14 @@ const Page: React.FC = () => {
       console.log(response);
       if (response.status === 200) {
         const roomRes = response.data as IRoomResponse;
-        const newRoom = roomRes.room;
-        if (newRoom) {
-          setRooms((prevRooms) => [...prevRooms, newRoom]);
-        }
+        const newRoom = roomRes.room as IRoom;
+        setRooms((prevRooms) => [...prevRooms, newRoom]);
+        toast.success(
+          <div className="p-2">
+            <h1 className="text-lg ">Room created successfully</h1>
+            <p className="text-sm ">Room details: {JSON.stringify(newRoom)}</p>
+          </div>
+        );
         setRoomName("");
         setRoomCapacity(0);
         setRoomDescription([]);
@@ -126,6 +141,7 @@ const Page: React.FC = () => {
       }
     } catch (error) {
       console.error(error);
+      toast.error(`Error creating room: ${error}`);
     }
   };
 
@@ -146,29 +162,15 @@ const Page: React.FC = () => {
         const roomRes = response.data as IRoomResponse;
         const updatedRoom = roomRes.room;
         console.log(updatedRoom);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleDeleteRoom = async (roomId: string) => {
-    try {
-      const response = await post(`/admin/roomDelete`, {
-        roomId,
-      });
-      console.log(response);
-      if (response.status === 200) {
-        const roomRes = response.data as IRoomResponse;
-        const deletedRoom = roomRes.room;
-        if (deletedRoom) {
-          setRooms((prevRooms) =>
-            prevRooms.filter((room) => room.id !== deletedRoom.id)
-          );
+        if (updatedRoom?.isAvailable) {
+          toast.success("Room is now available for booking");
+        } else {
+          toast.warning("The room set to not for booking");
         }
       }
     } catch (error) {
       console.error(error);
+      toast.error(`Error changing the room status: ${error}`);
     }
   };
 
@@ -176,19 +178,6 @@ const Page: React.FC = () => {
     <div className="container mx-auto py-10 px-8">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       <p className="text-xl mb-8">Welcome, {user?.name || "Admin"}!</p>
-
-      <div className="w-full mb-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>My Activities</CardTitle>
-            <CardDescription>Recent actions and events</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Last login: Today</p>
-            <p>Email: {user?.email || "No email available"}</p>
-          </CardContent>
-        </Card>
-      </div>
 
       <div className="w-full py-6">
         <h1 className="text-2xl font-bold mb-4">Create a room</h1>
@@ -339,13 +328,7 @@ const Page: React.FC = () => {
                     >
                       View Booking requests
                     </Button>
-                    <Button
-                      variant={"destructive"}
-                      className="cursor-pointer"
-                      onClick={() => handleDeleteRoom(room.id)}
-                    >
-                      Delete room
-                    </Button>
+                    <DeleteRoom roomId={room.id} setRooms={setRooms} />
                   </div>
                 </CardFooter>
               </Card>

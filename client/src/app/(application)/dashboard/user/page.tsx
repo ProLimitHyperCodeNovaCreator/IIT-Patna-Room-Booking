@@ -85,19 +85,6 @@ const Page: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6">User Dashboard</h1>
       <p className="text-xl mb-8">Welcome, {user?.name || "User"}!</p>
 
-      <div className="w-full mb-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>My Activities</CardTitle>
-            <CardDescription>Recent actions and events</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Last login: Today</p>
-            <p>Email: {user?.email || "No email available"}</p>
-          </CardContent>
-        </Card>
-      </div>
-
       <div className="w-full flex flex-col items-start mt-4">
         <div className="flex gap-2 items-center w-full max-w-md mb-4">
           <Search className="w-6 h-6" />

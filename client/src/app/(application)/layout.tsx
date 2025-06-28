@@ -6,6 +6,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main>{children}</main>
+        <Toaster richColors position="top-right"/>
       </SidebarInset>
     </SidebarProvider>
   );
