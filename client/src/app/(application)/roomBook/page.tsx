@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Users, Calendar, Eye, Loader2, Laugh } from "lucide-react";
+import { Search, MapPin, Users, Calendar, Eye, Loader2 } from "lucide-react";
 
 interface IUser {
   role: "ADMIN" | "USER";
@@ -42,7 +42,6 @@ interface IRoom {
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const [user, setUser] = useState<IUser | null>(null);
   const [query, setQuery] = useState<string>("");
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,14 +57,13 @@ const Page: React.FC = () => {
         if (response.status === 200) {
           const request = response.data as IAuthResponse;
           const currentUser = request.user;
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+
           if (currentUser) {
             if (rooms.status === 200) {
               console.log(rooms);
               const roomRes = rooms.data as IRoomResponse;
               setRooms(roomRes.rooms);
             }
-            setUser(currentUser);
           }
         } else if (response.status === 401) {
           router.push("/login");
@@ -73,7 +71,7 @@ const Page: React.FC = () => {
       } catch (error) {
         console.log(error);
         router.push("/login");
-      }finally{
+      }finally {
         setLoading(false);
       }
     };
@@ -200,20 +198,6 @@ const Page: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            <Laugh className="inline-block h-8 w-8 mr-2" />
-            User Dashboard
-          </h1>
-          <p className="text-lg text-gray-600">
-            Welcome back,{" "}
-            <span className="font-semibold text-gray-900">
-              {user?.name || "User"}
-            </span>
-            !
-          </p>
-        </div>
 
         {/* Search Section */}
         <div className="mb-8">

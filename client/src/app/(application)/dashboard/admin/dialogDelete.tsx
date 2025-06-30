@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { post } from "@/services/apiEndPoints"
+import { Trash2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface IRoom {
   id: string;
@@ -41,6 +43,7 @@ export function DeleteRoom({roomId, setRooms}: {roomId: string, setRooms: React.
           setRooms((prevRooms) =>
             prevRooms.filter((room) => room.id !== deletedRoom.id)
           );
+          toast.warning(`Room: ${deletedRoom.name} deleted successfully!`);
         }
       }
     } catch (error) {
@@ -50,7 +53,12 @@ export function DeleteRoom({roomId, setRooms}: {roomId: string, setRooms: React.
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">Delete Room</Button>
+        <Button
+          variant="outline"
+          className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

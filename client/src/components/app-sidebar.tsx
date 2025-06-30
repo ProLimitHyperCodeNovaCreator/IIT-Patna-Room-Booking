@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/sidebar";
 import { getUserData } from "@/lib/getUserData";
 import { useSidebar } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils"
-
+import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface IUser {
   role: "ADMIN" | "USER";
@@ -24,36 +24,21 @@ interface IUser {
   initials: string;
 }
 
-const user = (await getUserData()) as IUser;
-
-const data = {
-  user: {
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    avatar: user.initials,
-  },
-  projects: [
-    {
-      name: "Home",
-      url: "#",
-      icon: House,
-    },
-    {
-      name: "My Requests",
-      url: "#",
-      icon: CalendarCheck,
-    },
-    {
-      name: "Book a room",
-      url: "#",
-      icon: CalendarPlus,
-    },
-  ],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
+  const [user, setUser] = useState<IUser>();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await getUserData();
+        setUser(userData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const isCollapsed = state === "collapsed";
   return (
@@ -74,10 +59,44 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.projects} />
+        <NavProjects
+          projects={[
+            {
+              name: "Home",
+              url: "/",
+              icon: House,
+            },
+            {
+              name: "My Requests",
+              url: "/seeMyRequests",
+              icon: CalendarCheck,
+            },
+            {
+              name: "Book a room",
+              url: "/roomBook",
+              icon: CalendarPlus,
+            },
+          ]}
+        />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={
+            user
+              ? {
+                  name: user.name,
+                  email: user.email,
+                  role: user.role,
+                  avatar: user.initials,
+                }
+              : {
+                  name: "UserX",
+                  email: "unknown@domain.com",
+                  role: "USER",
+                  avatar: "UX",
+                }
+          }
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

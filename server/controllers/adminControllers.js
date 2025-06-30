@@ -65,6 +65,31 @@ const declineBooking = async (req, res) => {
   }
 };
 
+const deleteClashedBookings = async (roomId, startTime, endTime) => {
+  try {
+    await prisma.booking.deleteMany({
+      where: {
+        roomId,
+        status: "PENDING",
+        AND: [
+          {
+            startTime: {
+              lte: endTime,
+            },
+          },
+          {
+            endTime: {
+              gte: startTime,
+            },
+          },
+        ],
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const acceptBooking = async (req, res) => {
   try {
     const { bookingId } = req.body;
@@ -78,6 +103,7 @@ const acceptBooking = async (req, res) => {
         approvedById: userId,
       },
     });
+    deleteClashedBookings(booking.roomId, booking.startTime, booking.endTime);
     res.status(200).json({ message: "Booking accepted successfully", booking });
   } catch (error) {
     console.error(error);

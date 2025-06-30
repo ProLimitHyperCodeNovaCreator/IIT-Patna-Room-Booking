@@ -29,6 +29,7 @@ instance.interceptors.response.use(
   },
   (error: AxiosError): Promise<AxiosError> => {
     if (
+      typeof window !== "undefined" &&
       error.response?.status === 401 &&
       window.location.pathname !== "/login"
     ) {
@@ -51,14 +52,12 @@ function handleUnauthorized(): void {
 }
 
 // Utility functions
-export const get = <T>(url: string, params?: any) =>
+export const get = <T>(url: string, params?) =>
   instance.get<T>(url, { params });
 
-export const post = <T>(url: string, data: any) =>
-  instance.post<T>(url, data);
+export const post = <T>(url: string, data) => instance.post<T>(url, data);
 
-export const put = <T>(url: string, data: any) =>
-  instance.put<T>(url, data);
+export const put = <T>(url: string, data) => instance.put<T>(url, data);
 
 export const deleteRequest = <T>(url: string) => instance.delete<T>(url);
 
