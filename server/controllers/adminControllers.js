@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { mailFunction } = require("../engines/nodemailerEngine");
 const prisma = new PrismaClient();
 
 const createRoom = async (req, res) => {
@@ -73,12 +74,12 @@ const deleteClashedBookings = async (roomId, startTime, endTime) => {
         status: "PENDING",
         AND: [
           {
-            startTime: {
+            startDate: {
               lte: endTime,
             },
           },
           {
-            endTime: {
+            endDate: {
               gte: startTime,
             },
           },
@@ -98,12 +99,27 @@ const acceptBooking = async (req, res) => {
       where: {
         id: bookingId,
       },
+      include: {
+        requestedBy: {
+          select: {
+            email: true,
+          },
+        },
+        room: {
+          select: {
+            name: true,
+          },
+        },
+      },
       data: {
         status: "APPROVED",
         approvedById: userId,
       },
     });
     deleteClashedBookings(booking.roomId, booking.startTime, booking.endTime);
+    console.log(booking);
+    // Send confirmation email
+    await mailFunction(booking.requestedBy.email, booking);
     res.status(200).json({ message: "Booking accepted successfully", booking });
   } catch (error) {
     console.error(error);
