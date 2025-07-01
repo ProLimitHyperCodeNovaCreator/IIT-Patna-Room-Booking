@@ -3,9 +3,18 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { get, post } from "@/services/apiEndPoints";
 import { toast } from "sonner";
-import { Calendar, Clock, Mail, User, ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import {
+  Calendar,
+  Clock,
+  Mail,
+  User,
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+  Loader2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthProvider";
 
 interface IUser {
@@ -35,85 +44,91 @@ interface IBooking {
 const Page: React.FC = () => {
   const router = useRouter();
   const [bookings, setBookings] = useState<IBooking[]>([]);
-  const [processingId, setProcessingId] = useState<string | null>(null)
+  const [processingId, setProcessingId] = useState<string | null>(null);
   const { id } = useParams();
-  const { user, loading } = useAuth() as { user: IUser | null, loading: boolean };
+  const { user, loading } = useAuth() as {
+    user: IUser | null;
+    loading: boolean;
+  };
   const [load, setLoad] = useState<boolean>(true);
 
   useEffect(() => {
+    if (loading) return; // Prevent fetching if still loading
     const FetchData = async () => {
       try {
+        if (!user || user.role !== "ADMIN") {
+          toast.error("Unauthorized access");
+          router.push("/dashboard/user");
+          return null; // Prevent rendering if unauthorized
+        }
+
         const Bookresponse = await get(`/admin/requestedBookings/${id}`);
         const Bookrequest = Bookresponse.data as IBookResponse;
         const data = Bookrequest.bookings as IBooking[];
         setBookings(data);
       } catch (error) {
-        console.error("Error fetching data:", error)
-        toast.error("Failed to load booking requests")
-      }finally{
-        setLoad(false)
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load booking requests");
+      } finally {
+        setLoad(false);
       }
     };
 
     FetchData();
-  }, [router, id]);
-
-  if (!user || user.role !== "ADMIN") {
-    toast.error("Unauthorized access");
-    router.push("/dashboard/user");
-    return null; // Prevent rendering if unauthorized
-  }
+  }, [router, id, loading, user]);
 
   const handleDecline = async (bookingId: string) => {
-    setProcessingId(bookingId)
+    setProcessingId(bookingId);
     try {
-      const response = await post(`/admin/declineBooking`, { bookingId })
+      const response = await post(`/admin/declineBooking`, { bookingId });
       if (response.status === 200) {
-        toast.success("Booking request declined")
+        toast.success("Booking request declined");
         // Refresh bookings
-        const bookingResponse = await get(`/admin/requestedBookings/${id}`)
-        const bookingRequest = bookingResponse.data as IBookResponse
-        setBookings(bookingRequest.bookings || [])
+        const bookingResponse = await get(`/admin/requestedBookings/${id}`);
+        const bookingRequest = bookingResponse.data as IBookResponse;
+        setBookings(bookingRequest.bookings || []);
       } else {
-        toast.error("Failed to decline booking")
+        toast.error("Failed to decline booking");
       }
     } catch (error) {
-      console.error("Error declining booking:", error)
-      toast.error("Failed to decline booking")
+      console.error("Error declining booking:", error);
+      toast.error("Failed to decline booking");
     } finally {
-      setProcessingId(null)
+      setProcessingId(null);
     }
-  }
+  };
 
   const handleAccept = async (bookingId: string) => {
-    setProcessingId(bookingId)
+    setProcessingId(bookingId);
     try {
-      const response = await post(`/admin/acceptBooking`, { bookingId })
+      const response = await post(`/admin/acceptBooking`, { bookingId });
       if (response.status === 200) {
-        toast.success("Booking request accepted")
+        toast.success("Booking request accepted");
         // Refresh bookings
-        const bookingResponse = await get(`/admin/requestedBookings/${id}`)
-        const bookingRequest = bookingResponse.data as IBookResponse
-        setBookings(bookingRequest.bookings || [])
+        const bookingResponse = await get(`/admin/requestedBookings/${id}`);
+        const bookingRequest = bookingResponse.data as IBookResponse;
+        setBookings(bookingRequest.bookings || []);
       } else {
-        toast.error("Failed to accept booking")
+        toast.error("Failed to accept booking");
       }
     } catch (error) {
-      console.error("Error accepting booking:", error)
-      toast.error("Failed to accept booking")
+      console.error("Error accepting booking:", error);
+      toast.error("Failed to accept booking");
     } finally {
-      setProcessingId(null)
+      setProcessingId(null);
     }
-  }
+  };
   if (loading || load) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex items-center space-x-3">
           <Loader2 className="h-6 w-6 animate-spin text-black" />
-          <span className="text-lg font-medium text-black">Loading requests...</span>
+          <span className="text-lg font-medium text-black">
+            Loading requests...
+          </span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -131,8 +146,12 @@ const Page: React.FC = () => {
           </Button>
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-light text-black tracking-tight">Booking Requests</h1>
-            <p className="text-gray-600 font-light">Review and manage room booking requests</p>
+            <h1 className="text-3xl font-light text-black tracking-tight">
+              Booking Requests
+            </h1>
+            <p className="text-gray-600 font-light">
+              Review and manage room booking requests
+            </p>
           </div>
         </div>
 
@@ -147,8 +166,12 @@ const Page: React.FC = () => {
                 <CardContent className="p-8">
                   {/* Event Title */}
                   <div className="mb-6">
-                    <h2 className="text-2xl font-light text-black mb-2">{booking.eventTitle}</h2>
-                    <p className="text-gray-600 leading-relaxed">{booking.eventDescription}</p>
+                    <h2 className="text-2xl font-light text-black mb-2">
+                      {booking.eventTitle}
+                    </h2>
+                    <p className="text-gray-600 leading-relaxed">
+                      {booking.eventDescription}
+                    </p>
                   </div>
 
                   {/* Event Details Grid */}
@@ -157,17 +180,22 @@ const Page: React.FC = () => {
                       <div className="flex items-start space-x-3">
                         <Calendar className="h-5 w-5 text-black mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-black mb-1">Start Time</p>
+                          <p className="text-sm font-medium text-black mb-1">
+                            Start Time
+                          </p>
                           <p className="text-gray-600">
-                            {new Date(booking.startDate!).toLocaleString("en-US", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            })}
+                            {new Date(booking.startDate!).toLocaleString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )}
                           </p>
                         </div>
                       </div>
@@ -175,17 +203,22 @@ const Page: React.FC = () => {
                       <div className="flex items-start space-x-3">
                         <Clock className="h-5 w-5 text-black mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-black mb-1">End Time</p>
+                          <p className="text-sm font-medium text-black mb-1">
+                            End Time
+                          </p>
                           <p className="text-gray-600">
-                            {new Date(booking.endDate!).toLocaleString("en-US", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            })}
+                            {new Date(booking.endDate!).toLocaleString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )}
                           </p>
                         </div>
                       </div>
@@ -195,16 +228,24 @@ const Page: React.FC = () => {
                       <div className="flex items-start space-x-3">
                         <User className="h-5 w-5 text-black mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-black mb-1">Requested By</p>
-                          <p className="text-gray-600">{booking.requestedBy?.name}</p>
+                          <p className="text-sm font-medium text-black mb-1">
+                            Requested By
+                          </p>
+                          <p className="text-gray-600">
+                            {booking.requestedBy?.name}
+                          </p>
                         </div>
                       </div>
 
                       <div className="flex items-start space-x-3">
                         <Mail className="h-5 w-5 text-black mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-black mb-1">Email</p>
-                          <p className="text-gray-600">{booking.requestedBy?.email}</p>
+                          <p className="text-sm font-medium text-black mb-1">
+                            Email
+                          </p>
+                          <p className="text-gray-600">
+                            {booking.requestedBy?.email}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -249,14 +290,18 @@ const Page: React.FC = () => {
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Calendar className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-xl font-light text-black mb-2">No Pending Requests</h3>
-              <p className="text-gray-600 font-light">All booking requests have been processed.</p>
+              <h3 className="text-xl font-light text-black mb-2">
+                No Pending Requests
+              </h3>
+              <p className="text-gray-600 font-light">
+                All booking requests have been processed.
+              </p>
             </div>
           </div>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;

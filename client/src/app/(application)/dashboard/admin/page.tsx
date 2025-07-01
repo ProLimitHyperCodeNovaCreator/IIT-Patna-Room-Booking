@@ -359,19 +359,20 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const { user, loading } = useAuth() as { user: IUser | null, loading: boolean }
   const [load, setLoad] = useState<boolean>(true)
-
+  console.log(loading, load, user, user?.role);
   useEffect(() => {
+    if(loading) return;
     const fetchData = async () => {
       try {
-        setError(null)
-        const roomsResponse = await get("/user/rooms");
-        const roomsRequest = roomsResponse.data as IRoomResponse;
-        // Check if user is authenticated and has ADMIN role
         if (!user || user.role !== "ADMIN") {
           toast.error("Unauthorized access")
           router.push("/dashboard/user")
           return
         }
+        setError(null)
+        const roomsResponse = await get("/user/rooms");
+        const roomsRequest = roomsResponse.data as IRoomResponse;
+        // Check if user is authenticated and has ADMIN role
         // Handle rooms response
         if (roomsResponse.status === 200 && !roomsRequest.error) {
           const roomRes = roomsResponse.data as IRoomResponse
@@ -388,7 +389,7 @@ const Page: React.FC = () => {
     }
 
     fetchData()
-  }, [router, user])
+  }, [router, user, loading])
 
   const filteredRooms = rooms.filter((room) => room.name.toLowerCase().includes(query.toLowerCase()))
 
