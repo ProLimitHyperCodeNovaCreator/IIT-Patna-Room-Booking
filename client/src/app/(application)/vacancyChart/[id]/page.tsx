@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { ArrowLeft, Calendar, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { useAuth } from "@/context/AuthProvider";
 
 interface IBooking {
   id?: string;
@@ -28,18 +29,13 @@ const Page: React.FC = () => {
   const router = useRouter();
   const { id } = useParams();
   const [bookings, setBookings] = useState<IBooking[]>([]);
-  const [loading, setLoading] = useState(true)
+  const { loading } = useAuth() as { loading: boolean };
+  const [load, setLoad] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userDetails, bookings] = await Promise.all([
-          get("/auth/token"),
-          get(`/user/roomBookings/${id}`),
-        ]);
-        if (userDetails.status === 401) {
-          router.push("/login");
-        }
+        const bookings = await get(`/user/roomBookings/${id}`);
         const bookingData = bookings.data as Iresponse;
         const bookingsData = bookingData.bookings as IBooking[];
         setBookings(bookingsData);
@@ -47,14 +43,14 @@ const Page: React.FC = () => {
         console.log(error);
         router.push("/login");
       }finally{
-        setLoading(false);
+        setLoad(false);
       }
     };
 
     fetchData();
   }, [router, id]);
 
-  if (loading) {
+  if (loading || load) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex items-center space-x-3">

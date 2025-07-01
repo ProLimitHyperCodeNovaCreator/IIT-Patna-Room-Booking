@@ -1,13 +1,14 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { post, get } from "@/services/apiEndPoints";
+import { post} from "@/services/apiEndPoints";
 import { toast } from "sonner"
 import { ArrowLeft, Calendar, Clock, FileText, Type, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { useAuth } from "@/context/AuthProvider";
 
 
 const Page: React.FC = () => {
@@ -18,31 +19,8 @@ const Page: React.FC = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        setLoading(true);
-        const response = await get("/auth/token");
-
-        if (response.status === 200) {
-          console.log("You can proceed to book a room");
-        } else if (response.status === 401) {
-          console.log("You need to login to book a room");
-          router.push("/login");
-        }
-      } catch (error) {
-        console.error(error);
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth(); // Call the async function
-  }, [router]);
+  const {loading} = useAuth() as {loading: boolean};
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

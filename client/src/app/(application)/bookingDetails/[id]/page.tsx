@@ -6,17 +6,13 @@ import { toast } from "sonner";
 import { Calendar, Clock, Mail, User, ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { useAuth } from "@/context/AuthProvider";
 
 interface IUser {
   role: "ADMIN" | "USER";
   email?: string;
   name?: string;
   id?: string;
-}
-
-interface IAuthResponse {
-  message?: string;
-  user?: IUser;
 }
 
 interface IBookResponse {
@@ -39,42 +35,34 @@ interface IBooking {
 const Page: React.FC = () => {
   const router = useRouter();
   const [bookings, setBookings] = useState<IBooking[]>([]);
-  const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<string | null>(null)
   const { id } = useParams();
+  const { user, loading } = useAuth() as { user: IUser | null, loading: boolean };
+  const [load, setLoad] = useState<boolean>(true);
+
   useEffect(() => {
     const FetchData = async () => {
       try {
-        const response = await get("/auth/token");
-        const request = response.data as IAuthResponse;
-        if (response.status === 401) {
-          toast.error("Authentication required")
-          router.push("/login")
-          return
-        }
-
-        if (request.user?.role !== "ADMIN") {
-          toast.error("Access denied")
-          router.push("/dashboard/user")
-          return
-        }
-
         const Bookresponse = await get(`/admin/requestedBookings/${id}`);
         const Bookrequest = Bookresponse.data as IBookResponse;
         const data = Bookrequest.bookings as IBooking[];
         setBookings(data);
-
       } catch (error) {
         console.error("Error fetching data:", error)
         toast.error("Failed to load booking requests")
-        router.push("/login")
-      }finally {
-        setLoading(false);
+      }finally{
+        setLoad(false)
       }
     };
 
     FetchData();
   }, [router, id]);
+
+  if (!user || user.role !== "ADMIN") {
+    toast.error("Unauthorized access");
+    router.push("/login");
+    return null; // Prevent rendering if unauthorized
+  }
 
   const handleDecline = async (bookingId: string) => {
     setProcessingId(bookingId)
@@ -117,7 +105,7 @@ const Page: React.FC = () => {
       setProcessingId(null)
     }
   }
-  if (loading) {
+  if (loading || load) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex items-center space-x-3">

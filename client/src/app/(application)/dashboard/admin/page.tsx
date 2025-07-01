@@ -25,17 +25,12 @@ import {
   AlertCircle,
 } from "lucide-react"
 import { DeleteRoom } from "./dialogDelete"
+import { useAuth } from "@/context/AuthProvider"
 
 interface IUser {
   role: "ADMIN" | "USER"
   email?: string
   name?: string
-}
-
-interface IAuthResponse {
-  message?: string
-  user?: IUser
-  error?: boolean
 }
 
 interface IRoom {
@@ -358,39 +353,25 @@ RoomCard.displayName = "RoomCard"
 
 const Page: React.FC = () => {
   const router = useRouter()
-  const [user, setUser] = useState<IUser | null>(null)
   const [query, setQuery] = useState<string>("")
   const [rooms, setRooms] = useState<IRoom[]>([])
-  const [loading, setLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const { user, loading } = useAuth() as { user: IUser | null, loading: boolean }
+  const [load, setLoad] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setError(null)
-        const [authResponse, roomsResponse] = await Promise.all([get("/auth/token"), get("/user/rooms")])
-        const authRequest = authResponse.data as IAuthResponse;
+        const roomsResponse = await get("/user/rooms");
         const roomsRequest = roomsResponse.data as IRoomResponse;
-        // Handle authentication response
-        if (authResponse.status === 200 && !authRequest.error) {
-          const request = authResponse.data as IAuthResponse
-          const currentUser = request.user
-
-          if (currentUser) {
-            if (currentUser.role !== "ADMIN") {
-              router.push("/dashboard/user")
-              return
-            }
-            setUser(currentUser)
-          }
-        } else if (authResponse.status === 401) {
+        // Check if user is authenticated and has ADMIN role
+        if (!user || user.role !== "ADMIN") {
+          toast.error("Unauthorized access")
           router.push("/login")
           return
-        } else if (authRequest.error) {
-          setError(authRequest.message || "Authentication failed")
         }
-
         // Handle rooms response
         if (roomsResponse.status === 200 && !roomsRequest.error) {
           const roomRes = roomsResponse.data as IRoomResponse
@@ -401,13 +382,13 @@ const Page: React.FC = () => {
       } catch (error) {
         console.error("Fetch error:", error)
         setError("Failed to load dashboard data")
-      } finally {
-        setLoading(false)
+      }finally{
+        setLoad(false)
       }
     }
 
     fetchData()
-  }, [router])
+  }, [router, user])
 
   const filteredRooms = rooms.filter((room) => room.name.toLowerCase().includes(query.toLowerCase()))
 
@@ -474,7 +455,7 @@ const Page: React.FC = () => {
     [router],
   )
 
-  if (loading) {
+  if (loading || load) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -14,16 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, Users, Calendar, Eye, Loader2, Laugh } from "lucide-react";
+import { useAuth } from "@/context/AuthProvider";
+import { toast } from "sonner";
 
 interface IUser {
   role: "ADMIN" | "USER";
   email?: string;
   name?: string;
-}
-
-interface IAuthResponse {
-  message?: string;
-  user?: IUser;
 }
 
 interface IRoomResponse {
@@ -42,39 +39,26 @@ interface IRoom {
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const [user, setUser] = useState<IUser | null>(null);
+  const { user, loading } = useAuth() as { user: IUser | null; loading: boolean };
   const [query, setQuery] = useState<string>("");
   const [rooms, setRooms] = useState<IRoom[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [load, setLoad] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [response, rooms] = await Promise.all([
-          get("/auth/token"),
-          get("/user/rooms"),
-        ]);
-
-        if (response.status === 200) {
-          const request = response.data as IAuthResponse;
-          const currentUser = request.user;
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          if (currentUser) {
-            if (rooms.status === 200) {
-              console.log(rooms);
-              const roomRes = rooms.data as IRoomResponse;
-              setRooms(roomRes.rooms);
-            }
-            setUser(currentUser);
-          }
-        } else if (response.status === 401) {
-          router.push("/login");
+        const rooms = await get("/user/rooms");
+        if(rooms.status !== 200) {
+          throw new Error("Failed to fetch rooms");
+        }else{
+          const roomRes = rooms.data as IRoomResponse;
+          setRooms(roomRes.rooms);
         }
       } catch (error) {
         console.log(error);
-        router.push("/login");
+        toast.error("Failed to fetch rooms. Please try again later.");
       }finally{
-        setLoading(false);
+        setLoad(false);
       }
     };
 
@@ -182,7 +166,7 @@ const Page: React.FC = () => {
     </div>
   );
 
-  if (loading) {
+  if (loading || load) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

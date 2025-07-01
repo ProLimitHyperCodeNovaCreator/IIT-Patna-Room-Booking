@@ -12,34 +12,20 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { getUserData } from "@/lib/getUserData";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthProvider";
 
 interface IUser {
   role: "ADMIN" | "USER";
   email: string;
   name: string | "UserX";
-  initials: string;
+  initials?: string;
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
-  const [user, setUser] = useState<IUser>();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getUserData();
-        setUser(userData);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchUser();
-  }, []);
-
+  const { user } = useAuth() as {user: IUser | null};
   const isCollapsed = state === "collapsed";
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -87,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   name: user.name,
                   email: user.email,
                   role: user.role,
-                  avatar: user.initials,
+                  avatar: user.name.split(" ").map((n) => n[0].toUpperCase()).join(""),
                 }
               : {
                   name: "UserX",

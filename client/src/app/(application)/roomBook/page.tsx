@@ -14,17 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, Users, Calendar, Eye, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthProvider";
+import { toast } from "sonner";
 
-interface IUser {
-  role: "ADMIN" | "USER";
-  email?: string;
-  name?: string;
-}
-
-interface IAuthResponse {
-  message?: string;
-  user?: IUser;
-}
 
 interface IRoomResponse {
   message: string;
@@ -42,42 +34,31 @@ interface IRoom {
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const [query, setQuery] = useState<string>("");
-  const [rooms, setRooms] = useState<IRoom[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [response, rooms] = await Promise.all([
-          get("/auth/token"),
-          get("/user/rooms"),
-        ]);
-
-        if (response.status === 200) {
-          const request = response.data as IAuthResponse;
-          const currentUser = request.user;
-
-          if (currentUser) {
-            if (rooms.status === 200) {
-              console.log(rooms);
-              const roomRes = rooms.data as IRoomResponse;
-              setRooms(roomRes.rooms);
-            }
+    const { loading } = useAuth() as { loading: boolean };
+    const [query, setQuery] = useState<string>("");
+    const [rooms, setRooms] = useState<IRoom[]>([]);
+    const [load, setLoad] = useState<boolean>(true);
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const rooms = await get("/user/rooms");
+          if(rooms.status !== 200) {
+            throw new Error("Failed to fetch rooms");
+          }else{
+            const roomRes = rooms.data as IRoomResponse;
+            setRooms(roomRes.rooms);
           }
-        } else if (response.status === 401) {
-          router.push("/login");
+        } catch (error) {
+          console.log(error);
+          toast.error("Failed to fetch rooms. Please try again later.");
+        }finally{
+          setLoad(false);
         }
-      } catch (error) {
-        console.log(error);
-        router.push("/login");
-      }finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [router]);
+      };
+  
+      fetchData();
+    }, [router]);
   const filteredRooms = rooms.filter((room) =>
     room.name.toLowerCase().includes(query.toLowerCase())
   );
@@ -180,7 +161,7 @@ const Page: React.FC = () => {
     </div>
   );
 
-  if (loading) {
+  if (loading || load) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { get } from "@/services/apiEndPoints";
 import { toast } from "sonner";
 import { getBookings } from "@/lib/bookingsRequests";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, FileText } from "lucide-react";
+import { useAuth } from "@/context/AuthProvider";
 
 interface IBookings {
   id: string;
@@ -31,23 +31,18 @@ interface IRoom {
 const Page: React.FC = () => {
   const router = useRouter();
   const [bookings, setBookings] = useState<IBookings[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { loading } = useAuth() as { loading: boolean };
+  const [load, setLoad] = useState<boolean>(true);
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await get("/auth/token");
-        if (response.status === 401) {
-          toast.error("You need to login");
-          router.push("/login");
-          return;
-        }
         const bookingsData = await getBookings();
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setBookings(bookingsData);
       } catch (error) {
         toast.error("Failed to fetch bookings" + error);
-      } finally {
-        setLoading(false);
+      }finally{
+        setLoad(false);
       }
     };
     fetchBookings();
@@ -130,7 +125,7 @@ const Page: React.FC = () => {
     </div>
   );
 
-  if (loading) {
+  if (load || loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-4xl mx-auto">
