@@ -1,3 +1,4 @@
+'use client'
 import {createContext, useContext, useState, useEffect} from 'react';
 import { useRouter } from 'next/navigation';
 import {get} from '@/services/apiEndPoints';
@@ -12,7 +13,7 @@ interface Iuser {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: "ADMIN" | "USER";
 }
 
 const AuthContext = createContext({

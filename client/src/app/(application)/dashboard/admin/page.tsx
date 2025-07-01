@@ -369,7 +369,7 @@ const Page: React.FC = () => {
         // Check if user is authenticated and has ADMIN role
         if (!user || user.role !== "ADMIN") {
           toast.error("Unauthorized access")
-          router.push("/login")
+          router.push("/dashboard/user")
           return
         }
         // Handle rooms response

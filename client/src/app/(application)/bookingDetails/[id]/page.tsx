@@ -60,7 +60,7 @@ const Page: React.FC = () => {
 
   if (!user || user.role !== "ADMIN") {
     toast.error("Unauthorized access");
-    router.push("/login");
+    router.push("/dashboard/user");
     return null; // Prevent rendering if unauthorized
   }
 

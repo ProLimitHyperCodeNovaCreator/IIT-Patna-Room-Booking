@@ -43,7 +43,6 @@ const Page: React.FC = () => {
   const [query, setQuery] = useState<string>("");
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [load, setLoad] = useState<boolean>(true);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
