@@ -359,7 +359,6 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const { user, loading } = useAuth() as { user: IUser | null, loading: boolean }
   const [load, setLoad] = useState<boolean>(true)
-  console.log(loading, load, user, user?.role);
   useEffect(() => {
     if(loading) return;
     const fetchData = async () => {

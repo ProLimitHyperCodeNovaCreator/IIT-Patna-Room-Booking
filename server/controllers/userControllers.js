@@ -1,13 +1,24 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const client = require("../config/client");
 
 const getRooms = async (req, res) => {
   try {
-    req.users = await prisma.user.findMany();
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    const result = await client.lrange("room:list", 0, -1);
+    if(result.length > 0) {
+      const parsedResult = result.map((room) => JSON.parse(room));
+      return res.status(200).json({ message: "Rooms fetched successfully", rooms: parsedResult });
+    }
+
     const rooms = await prisma.room.findMany();
+    const serializeRooms = rooms.map((room)=>JSON.stringify(room));
+    if(serializeRooms.length > 0) {
+      await client.rpush("room:list", ...serializeRooms);
+      await client.expire("room:list", 60 * 60); // Set expiration time to 1 hour
+    }
     res.status(200).json({ message: "Rooms fetched successfully", rooms });
   } catch (error) {
     console.error(error);
@@ -52,29 +63,52 @@ const roomBook = async (req, res) => {
           startDate,
           endDate,
         },
+        include: {
+          requestedBy: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          room: {
+            select: {
+              name: true,
+              capacity: true,
+              location: true,
+            },
+          },
+        },
       });
-      res
+      return res
         .status(201)
         .json({ message: "Room booked successfully", bookingRequest });
     } else {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Room is already booked for this period",
         bookingStatus: "rejected",
       });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 const roomBookings = async (req, res) => {
   try {
     const {roomId} = req.params;
+    const result = await client.lrange(`room:${roomId}:bookings:approved`, 0, -1);
+    if (result.length > 0) {
+      const parsedResult = result.map((booking) => JSON.parse(booking));
+      return res.status(200).json({ message: "Bookings fetched successfully", bookings: parsedResult });
+    }
     const bookings = await prisma.booking.findMany({
       where: {
         roomId,
         status: "APPROVED",
+        endDate:{
+          gte : new Date()
+        }
       },
       select: {
         id: true,
@@ -89,7 +123,15 @@ const roomBookings = async (req, res) => {
           },
         },
       },
+      orderBy: {
+        startDate: "desc",
+      },
     });
+    const serializeBookings = bookings.map((booking) => JSON.stringify(booking));
+    if (serializeBookings.length > 0) {
+      await client.rpush(`room:${roomId}:bookings:approved`, ...serializeBookings);
+      await client.expire(`room:${roomId}:bookings:approved`, 60 * 60);
+    }
     res.status(200).json({ message: "Bookings fetched successfully", bookings });
   } catch (error) {
     console.error(error);
@@ -99,6 +141,9 @@ const roomBookings = async (req, res) => {
 
 const requestedBookings = async(req,res)=>{
   const userId = req.user.id;
+  if(!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   try {
     const bookings = await prisma.booking.findMany({
       where: {

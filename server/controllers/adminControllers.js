@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
-const { mailFunction } = require("../engines/nodemailerEngine");
+const { mailFunction } = require("../config/nodemailerEngine");
+const client = require("../config/client");
 const prisma = new PrismaClient();
 
 const createRoom = async (req, res) => {
@@ -13,7 +14,10 @@ const createRoom = async (req, res) => {
         location,
       },
     });
-    res.status(201).json({ message: "Room created successfully", room});
+    const serializeRoom = JSON.stringify(room);
+    await client.rpush("room:list", serializeRoom);
+    await client.expire("room:list", 60 * 60); // Set expiration time to 1 hour
+    res.status(201).json({ message: "Room created successfully", room });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -27,6 +31,9 @@ const requestBookings = async (req, res) => {
       where: {
         roomId: id,
         status: "PENDING",
+        startDate: {
+          gte: new Date(),
+        },
       },
       include: {
         requestedBy: {
@@ -35,6 +42,16 @@ const requestBookings = async (req, res) => {
             email: true,
           },
         },
+        room: {
+          select: {
+            name: true,
+            capacity: true,
+            location: true,
+          },
+        },
+      },
+      orderBy: {
+        startDate: "asc",
       },
     });
     res
@@ -57,6 +74,21 @@ const declineBooking = async (req, res) => {
       data: {
         status: "REJECTED",
         approvedById: userId,
+      },
+      include: {
+        requestedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        room: {
+          select: {
+            name: true,
+            capacity: true,
+            location: true,
+          },
+        },
       },
     });
     res.status(200).json({ message: "Booking declined successfully", booking });
@@ -102,12 +134,15 @@ const acceptBooking = async (req, res) => {
       include: {
         requestedBy: {
           select: {
+            name: true,
             email: true,
           },
         },
         room: {
           select: {
             name: true,
+            capacity: true,
+            location: true,
           },
         },
       },
@@ -117,7 +152,8 @@ const acceptBooking = async (req, res) => {
       },
     });
     deleteClashedBookings(booking.roomId, booking.startTime, booking.endTime);
-    console.log(booking);
+    await client.rpush(`room:${booking.roomId}:bookings:approved`, JSON.stringify(booking));
+    await client.expire(`room:${booking.roomId}:bookings:approved`, 60 * 60); // Set expiration time to 1 hour
     // Send confirmation email
     await mailFunction(booking.requestedBy.email, booking);
     res.status(200).json({ message: "Booking accepted successfully", booking });
@@ -138,6 +174,18 @@ const avaibilityChange = async (req, res) => {
         isAvailable,
       },
     });
+    const key = "room:list";
+    const roomList = await client.lrange(key, 0, -1);
+    const updatedList = roomList.map((item) => {
+      const parsed = JSON.parse(item);
+      if (parsed.id === roomId) {
+        return JSON.stringify({ ...parsed, isAvailable });
+      }
+      return item;
+    });
+    await client.del(key);
+    await client.rpush(key, ...updatedList);
+    await client.expire(key, 60 * 60);
     res
       .status(200)
       .json({ message: "Room availability changed successfully", room });
@@ -154,6 +202,16 @@ const roomDelete = async (req, res) => {
         id: roomId,
       },
     });
+    const key = "room:list";
+    const roomList = await client.lrange(key, 0, -1);
+    const filteredList = roomList.filter((item) => {
+      const parsed = JSON.parse(item);
+      return parsed.id !== roomId;
+    });
+    await client.del(key);
+    await client.rpush(key, ...filteredList);
+    await client.expire(key, 60 * 60);
+    await client.del(`room:${roomId}:bookings:approved`);
     res.status(200).json({ message: "Room deleted successfully", room });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
