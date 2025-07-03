@@ -4,7 +4,9 @@
   "description": "This is a project that will ensure proper localization of IITP rooms and will make ensure to make allocations of IITP rooms easier",
   "main": "app.js",
   "scripts": {
-    "start": "npx nodemon app.js",
+    "start": "concurrently \"npm run server\" \"npm run worker\"",
+    "server": "npx nodemon app.js",
+    "worker": "node config/email-worker.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
     "build": "tsc",
@@ -21,6 +23,7 @@
   "dependencies": {
     "@prisma/client": "^6.9.0",
     "bullmq": "^5.56.1",
+    "concurrently": "^9.2.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
