@@ -1,8 +1,13 @@
 const { PrismaClient } = require("@prisma/client");
-const { mailFunction } = require("../config/nodemailerEngine");
 const client = require("../config/client");
 const prisma = new PrismaClient();
+const { Queue } = require("bullmq");
+const connection = require("../utils/ioConnection");
 
+const mailingqueue = new Queue("Emails", {
+  connection,
+});
+// This queue is used to send emails for booking confirmations
 const createRoom = async (req, res) => {
   try {
     const { name, capacity, description, location } = req.body;
@@ -152,10 +157,26 @@ const acceptBooking = async (req, res) => {
       },
     });
     deleteClashedBookings(booking.roomId, booking.startTime, booking.endTime);
-    await client.rpush(`room:${booking.roomId}:bookings:approved`, JSON.stringify(booking));
+    await client.rpush(
+      `room:${booking.roomId}:bookings:approved`,
+      JSON.stringify(booking)
+    );
     await client.expire(`room:${booking.roomId}:bookings:approved`, 60 * 60); // Set expiration time to 1 hour
     // Send confirmation email
-    await mailFunction(booking.requestedBy.email, booking);
+    await mailingqueue.add(
+      `booking:${booking.id}`,
+      { booking, email: booking.requestedBy.email },
+      {
+        removeOnComplete: true,
+        removeOnFail: true,
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 5000,
+        },
+        lifo: false,
+      }
+    );
     res.status(200).json({ message: "Booking accepted successfully", booking });
   } catch (error) {
     console.error(error);

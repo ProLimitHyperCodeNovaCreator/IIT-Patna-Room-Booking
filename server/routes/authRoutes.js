@@ -55,9 +55,6 @@ router.get("/logout", (req, res) => {
 
 router.get("/token", (req, res) => {
   const token = req.cookies.token;
-  console.log(req.cookies)
-  console.log("the request is made")
-  console.log(token);
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

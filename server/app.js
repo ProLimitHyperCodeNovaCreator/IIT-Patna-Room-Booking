@@ -1,7 +1,8 @@
+const dotenv = require("dotenv");
+dotenv.config(); // Load .env variables
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
-const dotenv = require("dotenv");
 const authRoutes = require('./routes/authRoutes');
 const demoRoutes = require('./routes/demoRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -10,7 +11,6 @@ const session = require("express-session");
 const passport = require("passport");
 require("./config/passport");
 
-dotenv.config(); // Load .env variables
 
 const app = express();
 const port = process.env.PORT || 5000;
