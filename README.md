@@ -55,39 +55,39 @@
 
 ---
 
-### Steps:
+## Steps:
 
-# 1. Clone the repository
+### 1. Clone the repository
 ```bash
 git clone https://github.com/your-username/roommaze.git
 cd roommaze
 ```
 
-# 2. Setup environment variables
+### 2. Setup environment variables
 ```bash
 cp .env.example .env
 ```
-# Fill in your DB_URL, Gmail SMTP creds, Google OAuth client ID/secret, etc.
+### Fill in your DB_URL, Gmail SMTP creds, Google OAuth client ID/secret, etc.
 
-# 3. Start development containers
+### 3. Start development containers
 ```bash
 docker-compose up --build
 ```
 
-# 4. Access the app
-# Frontend: http://localhost:3000
-# Backend: http://localhost:5000
+### 4. Access the app
+- Frontend: http://localhost:3000
+- Backend: http://localhost:5000
 
 ---
 
 ## 📩 Email Notifications
 
-# We use Nodemailer with Gmail to send:
+### We use Nodemailer with Gmail to send:
 
 - Approval notifications
 - Automated Admin responses
 
-# Setup your Gmail credentials securely via .env as:
+### Setup your Gmail credentials securely via .env as:
 ```bash
 EMAIL_USER=your@gmail.com
 EMAIL_PASS=your-gmail-app-password
@@ -104,17 +104,17 @@ EMAIL_PASS=your-gmail-app-password
 ---
 
 ## 🤝 Contributing
-# Pull requests are welcome! For major changes, please open an issue first to discuss what you’d like to change or improve.
+### Pull requests are welcome! For major changes, please open an issue first to discuss what you’d like to change or improve.
 
 ---
 
 ## 📄 License
-# MIT © Aditya Agarwal – IIT Patna
+### MIT © Aditya Agarwal – IIT Patna
 
 ---
 
 ## 💌 Contact
-# Feel free to reach out for feedback, ideas, or collaboration:
+### Feel free to reach out for feedback, ideas, or collaboration:
 - LinkedIn: [www.linkedin.com/in/aditya-agarwal-39a350298]
 - Email: [adityaworkspace0539@gmail.com]
 
