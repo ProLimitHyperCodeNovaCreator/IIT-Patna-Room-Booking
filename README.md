@@ -22,28 +22,32 @@
 
 ## ⚙️ Tech Stack
 
-### Frontend:
-- [Next.js](w)
-- [TypeScript](w)
-- [Tailwind CSS](w)
-- [ShadCN](w)
-- [Lucide React](w)
+### Frontend
+- ![Next.js](https://img.shields.io/badge/-Next.js-black?logo=next.js&logoColor=white) **Next.js**
+- ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white) **TypeScript**
+- ![Tailwind CSS](https://img.shields.io/badge/-TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white) **Tailwind CSS**
+- ![ShadCN](https://img.shields.io/badge/-ShadCN-000?logo=tailwindcss&labelColor=gray&color=black) **ShadCN**
+- ![Lucide React](https://img.shields.io/badge/-LucideReact-0A0A0A?logo=react&logoColor=white) **Lucide React**
 
-### Backend:
-- [Express.js](w)
-- [Prisma ORM](w)
-- [PostgreSQL](w)
-- [Redis](w)
-- [BullMQ](w)
-- [CORS](w)
+### Backend
+- ![Express.js](https://img.shields.io/badge/-Express.js-000000?logo=express&logoColor=white) **Express.js**
+- ![Prisma](https://img.shields.io/badge/-Prisma-2D3748?logo=prisma&logoColor=white) **Prisma ORM**
+- ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-4169E1?logo=postgresql&logoColor=white) **PostgreSQL**
+- ![Redis](https://img.shields.io/badge/-Redis-DC382D?logo=redis&logoColor=white) **Redis**
+- ![BullMQ](https://img.shields.io/badge/-BullMQ-FA5252?logo=nodedotjs&logoColor=white) **BullMQ**
+- ![CORS](https://img.shields.io/badge/-CORS-grey?logo=javascript) **CORS**
 
-### DevOps:
-- [Docker](w)
-- [Docker Compose](w)
+### DevOps
+- ![Docker](https://img.shields.io/badge/-Docker-2496ED?logo=docker&logoColor=white) **Docker**
+- ![Docker Compose](https://img.shields.io/badge/-Docker%20Compose-2496ED?logo=docker&logoColor=white) **Docker Compose**
 
-### Integrations:
-- [Google OAuth](w) (Authentication)
-- [Nodemailer](w) with Gmail SMTP (Email Notifications)
+### Integrations
+- ![Google OAuth](https://img.shields.io/badge/-GoogleOAuth-4285F4?logo=google&logoColor=white) **Google OAuth**
+- ![Nodemailer](https://img.shields.io/badge/-Nodemailer-EA4335?logo=gmail&logoColor=white) **Nodemailer** with Gmail SMTP
+
+### Testing / Performance
+- ![Artillery](https://img.shields.io/badge/-Artillery-E63946?logo=fastapi&logoColor=white) **Artillery**
+
 
 ---
 
