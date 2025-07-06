@@ -1,0 +1,20 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+  - duration: 60
+    arrivalRate: 10      # Normal Load
+  - duration: 30
+    arrivalRate: 50      # Spike Load
+  - duration: 30
+    arrivalRate: 100     # Stress Peak
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Cookie: "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWRpdHlhIFBhcnRoaWsiLCJlbWFpbCI6ImFkaXR5YXBhcnRoaWtAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWQiOiJiZDlhYTE5MC1hZjBmLTRlYzgtOTI4NS1iZmI0ZDllNjhkYWIiLCJpYXQiOjE3NTE3OTgzNTEsImV4cCI6MTc1MTgwMTk1MX0.ea1Na2rvPGnEJxVT7dQzS8wqqDRICmFr-0VEEiwl8sY"
+
+scenarios:
+  - name: "Authenticated token check"
+    flow:
+      - get:
+          url: /user/rooms

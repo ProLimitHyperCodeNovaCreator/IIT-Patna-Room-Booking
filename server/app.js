@@ -4,7 +4,6 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
-const demoRoutes = require('./routes/demoRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const session = require("express-session");
@@ -39,7 +38,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/auth', authRoutes);
-app.use('/api', demoRoutes);
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 
