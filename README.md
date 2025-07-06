@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 Features
+## Features
 
 ### 👨‍🎓 For Users:
 - Login securely via **Google OAuth**
@@ -47,7 +47,7 @@
 
 ---
 
-## 🧑‍💻 Local Development Setup
+## Local Development Setup
 ### Prerequisites:
 - Node.js ≥ 18.x
 - Docker & Docker Compose
@@ -80,7 +80,7 @@ docker-compose up --build
 
 ---
 
-## 📩 Email Notifications
+## Email Notifications
 
 ### We use Nodemailer with Gmail to send:
 
@@ -93,8 +93,35 @@ EMAIL_USER=your@gmail.com
 EMAIL_PASS=your-gmail-app-password
 ```
 ---
+## Load Testing with Artillery
 
-## 🔮 Future Plans
+### We tested the performance and scalability of the backend using Artillery, a modern load-testing toolkit.
+
+### Test Summary
+
+- Tool: Artillery v2.0.23
+- Tested Endpoint: POST /user/roomBook
+- Authentication: JWT token provided in cookie
+- Rate Limiter: 100 requests per 15 minutes per IP (Express Rate Limit)
+- Database: PostgreSQL with Prisma ORM
+- Caching: Redis
+- Token Verification: JSON Web Tokens (JWT)
+
+### Load Test Results
+
+```bash
+Total Requests:        5100
+Request Rate:          ~55/sec
+2xx Success Responses: 5100 (100%)
+Failures:              0
+Max Latency:           11 ms
+Mean Latency:          5.3 ms
+95th Percentile (P95): 7 ms
+99th Percentile (P99): 7.9 ms
+```
+
+---
+## Future Plans
 - Switch to Microsoft Azure AD for institute-wide SSO
 - Add role-based dashboards for faculty, admins, and students
 - Outlook calendar sync for approved event
