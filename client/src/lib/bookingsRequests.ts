@@ -29,7 +29,9 @@ export const getBookings = async (): Promise<IBooking[]> => {
             throw new Error("Failed to fetch bookings");
         }
     } catch (error) {
-        console.error("Error fetching bookings:", error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error fetching bookings:', error);
+        }
         throw error;
     }
 };

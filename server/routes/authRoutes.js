@@ -11,7 +11,7 @@ router.get("/google/callback",
   passport.authenticate("google", { session: false }),
   (req, res) => {
     const user = req.user;
-    console.log(user);
+    //console.log(user);
 
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -29,7 +29,7 @@ router.get("/google/callback",
       sameSite: "Lax",
       maxAge: 3600000, // 1 hour expiration
     });
-    console.log(token);
+    //console.log(token);
 
     // Option: Cookie or Redirect with token
     res.redirect(`http://localhost:3000/dashboard/${user.role.toLowerCase()}`);

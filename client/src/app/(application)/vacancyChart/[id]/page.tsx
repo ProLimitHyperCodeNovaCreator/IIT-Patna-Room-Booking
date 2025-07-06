@@ -40,7 +40,10 @@ const Page: React.FC = () => {
         const bookingsData = bookingData.bookings as IBooking[];
         setBookings(bookingsData);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Failed to fetch bookings:", error);
+        }
         router.push("/login");
       }finally{
         setLoad(false);

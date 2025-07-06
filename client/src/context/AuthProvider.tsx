@@ -38,7 +38,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(request.user as Iuser);
         }
       } catch (error) {
-        console.error('Failed to fetch user:', error);
+        if(process.env.NODE_ENV === 'development') {
+          console.error('Error fetching user:', error);
+        }
+        //console.error('Failed to fetch user:', error);
         toast.error('Failed to fetch user data');
         router.push('/login');
       } finally {

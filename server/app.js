@@ -14,8 +14,8 @@ require("./config/passport");
 const app = express();
 const port = process.env.PORT || 5000;
 
-console.log(`✅ Loaded PORT from .env: ${process.env.PORT}`);
-console.log(`✅ Allowed Origin: ${process.env.NEXTAUTH_URL}`);
+//console.log(`✅ Loaded PORT from .env: ${process.env.PORT}`);
+//console.log(`✅ Allowed Origin: ${process.env.NEXTAUTH_URL}`);
 
 // Middleware
 app.use(
@@ -47,5 +47,5 @@ app.get("/", (req, res) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`🚀 Express server running on http://localhost:${port}`);
+  //console.log(`🚀 Express server running on http://localhost:${port}`);
 });

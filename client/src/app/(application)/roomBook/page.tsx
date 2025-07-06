@@ -50,7 +50,9 @@ const Page: React.FC = () => {
             setRooms(roomRes.rooms);
           }
         } catch (error) {
-          console.log(error);
+          if (process.env.NODE_ENV === "development") {
+            console.error(error);
+          }
           toast.error("Failed to fetch rooms. Please try again later.");
         }finally{
           setLoad(false);

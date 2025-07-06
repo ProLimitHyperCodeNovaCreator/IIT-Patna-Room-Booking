@@ -67,7 +67,9 @@ const Page: React.FC = () => {
         const data = Bookrequest.bookings as IBooking[];
         setBookings(data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching booking requests:", error);
+        }
         toast.error("Failed to load booking requests");
       } finally {
         setLoad(false);
@@ -91,7 +93,9 @@ const Page: React.FC = () => {
         toast.error("Failed to decline booking");
       }
     } catch (error) {
-      console.error("Error declining booking:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error declining booking:", error);
+      }
       toast.error("Failed to decline booking");
     } finally {
       setProcessingId(null);
@@ -112,7 +116,9 @@ const Page: React.FC = () => {
         toast.error("Failed to accept booking");
       }
     } catch (error) {
-      console.error("Error accepting booking:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error accepting booking:", error);
+      }
       toast.error("Failed to accept booking");
     } finally {
       setProcessingId(null);

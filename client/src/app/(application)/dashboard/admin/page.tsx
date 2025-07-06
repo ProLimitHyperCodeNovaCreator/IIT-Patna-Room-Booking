@@ -380,7 +380,9 @@ const Page: React.FC = () => {
           setError(roomsRequest.message || "Failed to fetch rooms")
         }
       } catch (error) {
-        console.error("Fetch error:", error)
+        if (process.env.NODE_ENV === "development") {
+          console.error("Fetch error:", error);
+        }
         setError("Failed to load dashboard data")
       }finally{
         setLoad(false)
@@ -401,7 +403,6 @@ const Page: React.FC = () => {
     }) => {
       try {
         const response = await post(`/admin/createRoom`, formData)
-        console.log(response);
         const request = response.data as IRoomResponse
         if (response.status === 201 && !request.error) {
           const newRoom = request.room as IRoom
@@ -412,7 +413,9 @@ const Page: React.FC = () => {
           toast.error(request.message || "Failed to create room")
         }
       } catch (error) {
-        console.error(error)
+        if (process.env.NODE_ENV === "development") {
+          console.error(error);
+        }
         toast.error("Error creating room")
       }
     },
@@ -443,7 +446,9 @@ const Page: React.FC = () => {
     } catch (error) {
       // Revert optimistic update on error
       setRooms((prev) => prev.map((room) => (room.id === roomId ? { ...room, isAvailable: !isAvailable } : room)))
-      console.error(error)
+      if (process.env.NODE_ENV === "development") {
+        console.error(error)
+      }
       toast.error("Error changing room status")
     }
   }, [])

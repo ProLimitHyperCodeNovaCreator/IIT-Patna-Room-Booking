@@ -24,10 +24,10 @@ const Page: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Event Name:", eventName);
-    console.log("Event Description:", eventDescription);
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
+    // console.log("Event Name:", eventName);
+    // console.log("Event Description:", eventDescription);
+    // console.log("Start Date:", startDate);
+    // console.log("End Date:", endDate);
     setError(null);
 
     if (!eventName || !eventDescription || !startDate || !endDate) {
@@ -57,7 +57,7 @@ const Page: React.FC = () => {
         startDate: startDateTime,
         endDate: endDateTime,
       });
-      console.log(response);
+      // console.log(response);
       if (response.status === 201) {
         toast.success("Room booking request submitted successfully!")
         setEventName("")
@@ -71,7 +71,10 @@ const Page: React.FC = () => {
         setError("Booking failed. Please try again.")
       }
     } catch (error) {
-      console.error("Booking failed:", error)
+      if (process.env.NODE_ENV === "development") {
+        console.error("Booking error:", error)
+      }
+      // console.error("Booking failed:", error)
       setError("Booking failed. Please try again.")
     } finally {
       setSubmitting(false)

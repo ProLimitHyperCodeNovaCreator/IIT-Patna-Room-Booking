@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { get } from '@/services/apiEndPoints';
+import { toast } from "sonner";
 
 interface User {
   role: 'ADMIN' | 'USER';
@@ -33,8 +34,12 @@ export default function Home() {
         } else if (response.status === 401) {
           router.push('/login');
         }
-      } catch (error) {
-        console.error('Error fetching token:', error);
+      } catch(err){
+        if(process.env.NODE_ENV === 'development') {
+          console.error('Error fetching token:', err);
+        }
+        //console.error('Error fetching token:', error);
+        toast.error('Some error please try again');
         router.push('/login'); // fallback in case of fetch failure
       }
     }

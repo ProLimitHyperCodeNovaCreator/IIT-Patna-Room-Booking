@@ -45,7 +45,10 @@ function handleUnauthorized(): void {
   sessionStorage.clear();
 
   instance.get("/auth/logout").catch((err: AxiosError) => {
-    console.warn("Failed to hit logout endpoint:", err.message);
+    //console.warn("Failed to hit logout endpoint:", err.message);
+    if (process.env.NODE_ENV === "development") {
+      console.error("Failed to hit logout endpoint:", err.message);
+    }
   });
 
   window.location.href = "/login";

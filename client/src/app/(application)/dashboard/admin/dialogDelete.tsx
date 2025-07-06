@@ -35,7 +35,6 @@ export function DeleteRoom({roomId, setRooms}: {roomId: string, setRooms: React.
       const response = await post(`/admin/roomDelete`, {
         roomId,
       });
-      console.log(response);
       if (response.status === 200) {
         const roomRes = response.data as IRoomResponse;
         const deletedRoom = roomRes.room;
@@ -47,7 +46,9 @@ export function DeleteRoom({roomId, setRooms}: {roomId: string, setRooms: React.
         }
       }
     } catch (error) {
-      console.error(error);
+      if (process.env.NODE_ENV === "development") {
+        console.error(error);
+      }
     }
   };
   return (

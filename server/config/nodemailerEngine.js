@@ -3,7 +3,7 @@ const {bookingDetailEmail} = require("../utils/bookingEmail");
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 const mailFunction = async (userEmail, bookingData) => {
-  console.log(process.env.EMAIL_USER, process.env.EMAIL_APP_PASSWORD);
+  //console.log(process.env.EMAIL_USER, process.env.EMAIL_APP_PASSWORD);
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {

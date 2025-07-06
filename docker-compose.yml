@@ -3,8 +3,8 @@ version: '3.9'
 services:
   frontend:
     build: ./client
-    environment:
-      - NEXT_PUBLIC_SERVER=http://backend:5000
+    env_file:
+      - .env
     ports:
       - "3000:3000"
     depends_on:
@@ -14,13 +14,8 @@ services:
     build: ./server
     ports:
       - "5000:5000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:RogexJ48@database:5432/room_allocation?schema=public
-      - NEXTAUTH_URL=http://localhost:3000
-      - JWT_SECRET=your_secret_here
-      - NODE_ENV=development
-      - PORT=5000
-      - REDIS_URL=redis://redis:6379
+    env_file:
+      - .env
     depends_on:
       - database
       - redis
@@ -31,7 +26,7 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=RogexJ48
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=room_allocation
     restart: always
     volumes:

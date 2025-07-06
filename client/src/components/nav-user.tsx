@@ -21,6 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import {get} from "@/services/apiEndPoints";
+import { toast } from "sonner";
 
 export function NavUser({
   user,
@@ -42,10 +43,13 @@ export function NavUser({
       if (response.status === 200) {
         router.push("/login");
       } else {
-        console.error("Logout failed");
+        toast.error("Logout failed");
       }
     } catch (error) {
-      console.error("Error during logout:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Logout error:", error);
+      }
+      toast.error("Error during logout");
     }
   };
 

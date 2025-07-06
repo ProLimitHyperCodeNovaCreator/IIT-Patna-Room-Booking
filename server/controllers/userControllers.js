@@ -21,7 +21,7 @@ const getRooms = async (req, res) => {
     }
     res.status(200).json({ message: "Rooms fetched successfully", rooms });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -89,7 +89,7 @@ const roomBook = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -134,7 +134,7 @@ const roomBookings = async (req, res) => {
     }
     res.status(200).json({ message: "Bookings fetched successfully", bookings });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -165,7 +165,7 @@ const requestedBookings = async(req,res)=>{
     });
     res.status(200).json({ message: "Bookings fetched successfully", bookings });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

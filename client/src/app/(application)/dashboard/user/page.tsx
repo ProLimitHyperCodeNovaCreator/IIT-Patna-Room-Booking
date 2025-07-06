@@ -43,7 +43,6 @@ const Page: React.FC = () => {
   const [query, setQuery] = useState<string>("");
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [load, setLoad] = useState<boolean>(true);
-  console.log(user, user?.role);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,7 +54,9 @@ const Page: React.FC = () => {
           setRooms(roomRes.rooms);
         }
       } catch (error) {
-        console.log(error);
+        if (process.env.NODE_ENV === "development") {
+          console.error(error);
+        }
         toast.error("Failed to fetch rooms. Please try again later.");
       }finally{
         setLoad(false);

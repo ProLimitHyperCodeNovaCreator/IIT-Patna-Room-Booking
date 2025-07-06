@@ -24,7 +24,7 @@ const createRoom = async (req, res) => {
     await client.expire("room:list", 60 * 60); // Set expiration time to 1 hour
     res.status(201).json({ message: "Room created successfully", room });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -63,7 +63,7 @@ const requestBookings = async (req, res) => {
       .status(200)
       .json({ message: "Bookings fetched successfully", bookings });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -98,7 +98,7 @@ const declineBooking = async (req, res) => {
     });
     res.status(200).json({ message: "Booking declined successfully", booking });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -124,7 +124,7 @@ const deleteClashedBookings = async (roomId, startTime, endTime) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 };
 
@@ -179,7 +179,7 @@ const acceptBooking = async (req, res) => {
     );
     res.status(200).json({ message: "Booking accepted successfully", booking });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
