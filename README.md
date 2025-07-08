@@ -106,7 +106,7 @@ EMAIL_PASS=your-gmail-app-password
 - Tool: Artillery v2.0.23
 - Tested Endpoint: POST /user/roomBook
 - Authentication: JWT token provided in cookie
-- Rate Limiter: 100 requests per 15 minutes per IP (Express Rate Limit)
+- Rate Limiter: 100 requests per 15 minutes per IP (Express Rate Limit) only for booking route but we tested for get route just to check the latency and traffic handling
 - Database: PostgreSQL with Prisma ORM
 - Caching: Redis
 - Token Verification: JSON Web Tokens (JWT)
